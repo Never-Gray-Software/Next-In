@@ -60,25 +60,25 @@ Public Const TA_E_NO_MORE_TRIALS_ALLOWED = &H21
 
 ' You can either hardcode the paths or retrieve them dynamically.
 Public Function GetTADirectory() As String
-  ' Get the directory for TurboFloat (TurboFloat.dll and/or TurboFloat.x64.dll).
-  ' On Windows you can get the directory using the registry
-  ' See: http://support.microsoft.com/kb/145679/en-us
-  ' For example, if you have an installer for your extension just set the path
-  ' in the regirstry in your intaller. Then, in this function, read that value from
-  ' the registry.
-  ' Here we're just getting the path of the current Excel workbook
-  #If Mac Then
-    MsgBox "This worksheet only works on Windows"
-    ' You can specify the same folder for both versions of Office, or choose separate
-    ' folders. It's completely up to you.
+    ' Get the directory for TurboFloat (TurboFloat.dll and/or TurboFloat.x64.dll).
+    ' On Windows you can get the directory using the registry
+    ' See: http://support.microsoft.com/kb/145679/en-us
+    ' For example, if you have an installer for your extension just set the path
+    ' in the regirstry in your intaller. Then, in this function, read that value from
+    ' the registry.
+    ' Here we're just getting the path of the current Excel workbook
+    #If Mac Then
+        MsgBox "This worksheet only works on Windows"
+        ' You can specify the same folder for both versions of Office, or choose separate
+        ' folders. It's completely up to you.
 
-    ' Special case for Office 2016 and above
-    #If MAC_OFFICE_VERSION >= 15 Then
-      GetTADirectory = "/Library/Application Support/Microsoft/YourApp"
-    #Else ' Office 2011
-      GetTADirectory = "/Library/Application Support/Microsoft/YourApp"
-    #End If
-  #Else ' Windows
+        ' Special case for Office 2016 and above
+        #If MAC_OFFICE_VERSION >= 15 Then
+            GetTADirectory = "/Library/Application Support/Microsoft/YourApp"
+        #Else                                    ' Office 2011
+            GetTADirectory = "/Library/Application Support/Microsoft/YourApp"
+        #End If
+    #Else                                        ' Windows
         If Worksheets("Control").OptionButton1 Then
             GetTADirectory = Left(Environ("windir"), 3) & "Program Files\Next-In"
         ElseIf Worksheets("Control").OptionButton2 Then
@@ -86,6 +86,7 @@ Public Function GetTADirectory() As String
         Else
             GetTADirectory = "c:\Next-In"
         End If
-    'Debug.Print GetTADirectory
-  #End If
+        'Debug.Print GetTADirectory
+    #End If
 End Function
+

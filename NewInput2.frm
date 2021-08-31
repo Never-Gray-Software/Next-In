@@ -36,3 +36,4 @@ Private Sub ContinueButton2_Click()
     WriteForm.Hide
     Call Speedon(False)
 End Sub
+

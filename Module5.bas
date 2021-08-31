@@ -55,24 +55,25 @@ Function MoveAsc(ByVal a, ByVal mLvl)
     End If
     MoveAsc = a
 End Function
+
 Function encrypt(ByVal s As String, ByVal key As String)
     Dim p, keyPos, c, e, k, chkSum
     If key = "" Then
         encrypt = s
         Exit Function
     End If
-    For p = 1 To Len(s) 'check if character is valid in ASCII
+    For p = 1 To Len(s)                          'check if character is valid in ASCII
         If Asc(Mid(s, p, 1)) < MIN_ASC Or Asc(Mid(s, p, 1)) > MAX_ASC Then
             MsgBox "Char at position " & p & " is invalid!"
             Exit Function
         End If
     Next p
-    For keyPos = 1 To Len(key) 'Calculate a checksum
+    For keyPos = 1 To Len(key)                   'Calculate a checksum
         chkSum = chkSum + Asc(Mid(key, keyPos, 1)) * keyPos
     Next keyPos
     keyPos = 0
-    For p = 1 To Len(s) 'front beginning to end of string
-        c = Asc(Mid(s, p, 1)) 'go letter by letter
+    For p = 1 To Len(s)                          'front beginning to end of string
+        c = Asc(Mid(s, p, 1))                    'go letter by letter
         keyPos = keyPos + 1
         If keyPos > Len(key) Then keyPos = 1
         k = Asc(Mid(key, keyPos, 1))
@@ -80,11 +81,12 @@ Function encrypt(ByVal s As String, ByVal key As String)
         c = MoveAsc(c, k * Len(key))
         c = MoveAsc(c, chkSum * k)
         c = MoveAsc(c, p * k)
-        c = MoveAsc(c, Len(s) * p) 'This is only for getting new chars for different word lengths
+        c = MoveAsc(c, Len(s) * p)               'This is only for getting new chars for different word lengths
         e = e & Chr(c)
     Next p
     encrypt = e
 End Function
+
 Function decrypt(ByVal s As String, ByVal key As String)
     Dim p, keyPos, c, d, k, chkSum
     If key = "" Then
@@ -110,8 +112,9 @@ Function decrypt(ByVal s As String, ByVal key As String)
     Next p
     decrypt = d
 End Function
+
 Function Pull() As String
-    Dim key_pull(0 To 8) As String 'Key array
+    Dim key_pull(0 To 8) As String               'Key array
     Dim part1, part2, pk As String
     Dim str As String
     key_pull(0) = Application.UserName
@@ -132,27 +135,28 @@ Function Pull() As String
 End Function
 
 Function Clipboard(Optional StoreText As String) As String
-'From https://www.thespreadsheetguru.com/blog/2015/1/13/how-to-use-vba-code-to-copy-text-to-the-clipboard
-'PURPOSE: Read/Write to Clipboard
-'Source: ExcelHero.com (Daniel Ferry)
+    'From https://www.thespreadsheetguru.com/blog/2015/1/13/how-to-use-vba-code-to-copy-text-to-the-clipboard
+    'PURPOSE: Read/Write to Clipboard
+    'Source: ExcelHero.com (Daniel Ferry)
 
-Dim x As Variant
+    Dim x As Variant
 
-'Store as variant for 64-bit VBA support
-  x = StoreText
+    'Store as variant for 64-bit VBA support
+    x = StoreText
 
-'Create HTMLFile Object
-  With CreateObject("htmlfile")
-    With .parentWindow.clipboardData
-      Select Case True
-        Case Len(StoreText)
-          'Write to the clipboard
-            .setData "text", x
-        Case Else
-          'Read from the clipboard (no variable passed through)
-            Clipboard = .GetData("text")
-      End Select
+    'Create HTMLFile Object
+    With CreateObject("htmlfile")
+        With .parentWindow.clipboardData
+            Select Case True
+            Case Len(StoreText)
+                'Write to the clipboard
+                .setData "text", x
+            Case Else
+                'Read from the clipboard (no variable passed through)
+                Clipboard = .GetData("text")
+            End Select
+        End With
     End With
-  End With
 
 End Function
+

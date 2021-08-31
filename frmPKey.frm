@@ -19,40 +19,41 @@ Private ta As TurboActivate
 Private OKClicked As Boolean
 
 Private Sub btnActivate_Click()
-  ' tell your app to handle errors in the section
-  ' at the end of the sub
-  On Error GoTo TAError
+    ' tell your app to handle errors in the section
+    ' at the end of the sub
+    On Error GoTo TAError
   
-  ' save the new key
-  If Not GetTA().CheckAndSavePKey(txtPkey.Text, TA_SYSTEM) Then
-    Err.Raise _
-      Number:=1, _
-      Description:="The product key is not valid.", _
-      Source:="TurboActivate.CheckAndSavePKey"
-  End If
-  ' try to activate and close the form
-  Call GetTA().Activate
-  OKClicked = True
-  Unload Me
+    ' save the new key
+    If Not GetTA().CheckAndSavePKey(txtPkey.Text, TA_SYSTEM) Then
+        Err.Raise _
+        Number:=1, _
+        Description:="The product key is not valid.", _
+        Source:="TurboActivate.CheckAndSavePKey"
+    End If
+    ' try to activate and close the form
+    Call GetTA().Activate
+    OKClicked = True
+    Unload Me
 SubExit:
-  Exit Sub
+    Exit Sub
 TAError:
-  MsgBox Err.Description
-  Resume SubExit
+    MsgBox Err.Description
+    Resume SubExit
 End Sub
 
 Private Sub btnCancel_Click()
-  Unload Me
+    Unload Me
 End Sub
 
 Public Function ShowDialog(ByRef turboAct As TurboActivate) As VbMsgBoxResult
-  Set ta = turboAct
-  ' get the existing product key
-  If GetTA().IsProductKeyValid Then
-    txtPkey.Text = GetTA().GetPKey()
-  End If
-  Me.Show vbModal
-  ShowDialog = IIf(OKClicked, vbOK, vbCancel)
-  Unload Me
+    Set ta = turboAct
+    ' get the existing product key
+    If GetTA().IsProductKeyValid Then
+        txtPkey.Text = GetTA().GetPKey()
+    End If
+    Me.Show vbModal
+    ShowDialog = IIf(OKClicked, vbOK, vbCancel)
+    Unload Me
 End Function
+
 

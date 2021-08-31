@@ -40,22 +40,23 @@ Dim LastRow As Long
 Dim ipversion As Boolean
 
 Dim segtype As Integer
+
 Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
-  On Error GoTo ErrorProc
-  Dim num_sections, num_vents, num_line_sec As Integer 'Variables for Form 2
-  If Not CheckForValidKey Then Exit Sub
+    On Error GoTo ErrorProc
+    Dim num_sections, num_vents, num_line_sec As Integer 'Variables for Form 2
+    If Not CheckForValidKey Then Exit Sub
     Dim StartTime, Ftime, EndTime As Double
     StartTime = Timer
     WriteForm.Show vbModeless
     WriteForm.TextBox2.Value = "Formulas are Calculating"
     WriteForm.Repaint
     'Start program
-    Call Speedon(True) 'Makes the program work faster.
+    Call Speedon(True)                           'Makes the program work faster.
     Dim TC, LC, RC, LastRow, numlines, rF2 As Integer
     Dim FormRange As Range
-    TC = 5 'Top Cell with Data on most sheets
-    LC = 2 'Most left cell with data
-    Calculate 'make sure to recalculate any formulas
+    TC = 5                                       'Top Cell with Data on most sheets
+    LC = 2                                       'Most left cell with data
+    Calculate                                    'make sure to recalculate any formulas
     wname = ActiveWorkbook.Name
     ipversion = Workbooks(wname).Worksheets("Control").ipCheckBox.Value
     Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
@@ -80,7 +81,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         NumCol = 1
         'LRtext = FormIn.Range("D3:D21").End(xlDown).Row 'Last Row of titles with text'
         LRtext = FormIn.Range("D22").End(xlUp).Row 'Last Row of titles with text'
-        If LRtext < 23 Then 'Calculate number of lines to move down
+        If LRtext < 23 Then                      'Calculate number of lines to move down
             numlines = LRtext - Row + 1
         Else
             numlines = 1
@@ -89,39 +90,39 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         'Force format of Form 1A cells to be text. This prevents converting Dates to numerical values
         'Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow + numlines - 1, 1)).NumberFormat = "@"
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow + numlines - 1, 1)).Value2 = _
-        FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(LRtext, col)).Value2
+                                                                                               FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(LRtext, col)).Value2
         NextRow = NextRow + numlines
         'Form 1B
         Row = 23
         NumData = 3
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         NextRow = NextRow + 1
         Row = Row + NumData
         'Form 1C
         NumData = 8
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
-        TPO = FormIn.Cells(Row, col).Value2 'Train performance option
-        ECL = FormIn.Cells(Row + 3, col).Value2 'Environemtnal Control Load
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+        TPO = FormIn.Cells(Row, col).Value2      'Train performance option
+        ECL = FormIn.Cells(Row + 3, col).Value2  'Environemtnal Control Load
         NextRow = NextRow + 1
         Row = Row + NumData
         'Form 1D
         NumData = 7
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         NumUnsteady = FormIn.Cells(Row + 5, col).Value2
-        If ipversion Then 'adjust output sheet if using ipVersion
+        If ipversion Then                        'adjust output sheet if using ipVersion
             Output.Cells(NextRow, 8).Value2 = Output.Cells(NextRow, 7).Value2
             Output.Cells(NextRow, 7).Value2 = Output.Cells(NextRow, 6).Value2
             Output.Cells(NextRow, 6).Value2 = 0
         End If
-        NextRow = NextRow + 1 'Move to next line for Form 1E
-        Row = Row + NumData 'Move to next row on F01
+        NextRow = NextRow + 1                    'Move to next line for Form 1E
+        Row = Row + NumData                      'Move to next row on F01
         'Form 1E
         NumData = 8
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         NumECZ = FormIn.Cells(Row + 2, col).Value2
         InitialReadOption = FormIn.Cells(Row + 7, col).Value2
         If InitialReadOption <> 0 Then
@@ -132,589 +133,589 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         'Form 1F
         NumData = 8
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         NextRow = NextRow + 1
         Row = Row + NumData
         'Form 1G
         NumData = 8
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         NextRow = NextRow + 1
         Row = Row + NumData
         'Form 1H
         If Not ipversion Then
             NumData = 5
             Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                          Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             NextRow = NextRow + 1
             CPipe = FormIn.Cells(Row + 4, col).Value2
             Row = Row + NumData
         End If
         ' Form 2A
-            WriteForm.TextBox2.Value = "Writing Form 2A"
+        WriteForm.TextBox2.Value = "Writing Form 2A"
+        WriteForm.Repaint
+        num_sections = .Worksheets("F01").Range("D35").Value2
+        num_vents = .Worksheets("F01").Range("D36").Value2
+        num_line_sec = num_sections - num_vents  'Number of Line Sections for tunnels
+        rF2 = 5                                  'Starting row for Form 2A and 2B
+        RC = 5                                   'Number of columns of data
+        Set FormIn = .Worksheets("F02A")
+        With FormIn
+            Set FormRange = .Range(.Cells(rF2, LC), .Cells(rF2 + num_line_sec - 1, RC + LC - 1))
+        End With
+        With Output
+            .Range(.Cells(NextRow, 1), .Cells(NextRow + num_line_sec - 1, RC)).Value2 = FormRange.Value2
+        End With
+        NextRow = NextRow + num_line_sec
+        ' Form 2B
+        If num_vents > 0 Then
+            WriteForm.TextBox2.Value = "Writing Form 2B"
             WriteForm.Repaint
-            num_sections = .Worksheets("F01").Range("D35").Value2
-            num_vents = .Worksheets("F01").Range("D36").Value2
-            num_line_sec = num_sections - num_vents 'Number of Line Sections for tunnels
-            rF2 = 5 'Starting row for Form 2A and 2B
-            RC = 5 'Number of columns of data
-            Set FormIn = .Worksheets("F02A")
+            Set FormIn = .Worksheets("F02B")
+            RC = 5                               'Number of columns of data
             With FormIn
-                Set FormRange = .Range(.Cells(rF2, LC), .Cells(rF2 + num_line_sec - 1, RC + LC - 1))
+                Set FormRange = .Range(.Cells(rF2, LC), .Cells(rF2 + num_vents - 1, RC + LC - 1))
             End With
             With Output
-                .Range(.Cells(NextRow, 1), .Cells(NextRow + num_line_sec - 1, RC)).Value2 = FormRange.Value2
+                Output.Range(.Cells(NextRow, 1), .Cells(NextRow + num_vents - 1, RC)).Value2 = FormRange.Value2
             End With
-            NextRow = NextRow + num_line_sec
-         ' Form 2B
-            If num_vents > 0 Then
-                WriteForm.TextBox2.Value = "Writing Form 2B"
-                WriteForm.Repaint
-                Set FormIn = .Worksheets("F02B")
-                RC = 5 'Number of columns of data
-                With FormIn
-                    Set FormRange = .Range(.Cells(rF2, LC), .Cells(rF2 + num_vents - 1, RC + LC - 1))
-                End With
-                With Output
-                    Output.Range(.Cells(NextRow, 1), .Cells(NextRow + num_vents - 1, RC)).Value2 = FormRange.Value2
-                End With
-                    NextRow = NextRow + num_vents
-            End If
+            NextRow = NextRow + num_vents
+        End If
         ' Form 3
-            WriteForm.TextBox2.Value = "Producing Form 3"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F03")
-            'Set FormRange = FormIn.Range("A1:AX1500")
-            Row = 5 'Starting Row
-            col = 2 'Starting Column
-            Do While FormIn.Cells(Row, col) <> ""
+        WriteForm.TextBox2.Value = "Producing Form 3"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F03")
+        'Set FormRange = FormIn.Range("A1:AX1500")
+        Row = 5                                  'Starting Row
+        col = 2                                  'Starting Column
+        Do While FormIn.Cells(Row, col) <> ""
             'start of loop
             'Form 3A line
-                NumCol = 3
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
+            NumCol = 3
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
             'Form 3A line 2
-                col = col + NumCol 'Starting point for column
-                NumCol = 5 'Number of columns in this line of the form
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
+            col = col + NumCol                   'Starting point for column
+            NumCol = 5                           'Number of columns in this line of the form
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
             'Form 3B line 1
-                col = col + NumCol
-                NumCol = 8
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
+            col = col + NumCol
+            NumCol = 8
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
             'Form 3B line 2
-                col = col + NumCol
-                NumCol = 8
+            col = col + NumCol
+            NumCol = 8
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            'Form 3C
+            col = col + NumCol
+            NumCol = 7
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            NumofSub = FormIn.Cells(Row, col + 5).Value2 'Number of subsegments
+            NumofSSHS = FormIn.Cells(Row, col + 6).Value2 'Number of Steady-State heat sources
+            'Form 3D
+            col = col + NumCol
+            counter = 1
+            NumCol = 6
+            Do While ((counter < NumofSSHS) Or (counter = NumofSSHS)) ' Inner loop.
                 Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-             'Form 3C
-                col = col + NumCol
-                NumCol = 7
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                NumofSub = FormIn.Cells(Row, col + 5).Value2 'Number of subsegments
-                NumofSSHS = FormIn.Cells(Row, col + 6).Value2 'Number of Steady-State heat sources
-             'Form 3D
-                col = col + NumCol
-                counter = 1
-                NumCol = 6
-                Do While ((counter < NumofSSHS) Or (counter = NumofSSHS)) ' Inner loop.
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1 'Move one cell down for Output Sheet
-                    If counter > 99 Then
-                        MsgBox "Error in Form 3D, Ending Sub-Segment Number"
-                        End
-                    End If
-                    Row = Row + 1
-                    counter = counter + 1
-                Loop
-                Row = Row - counter + 1 'Resets Row back to start
-                'Form 3E
-                col = col + NumCol
-                NumCol = 5
-                EndSub = 0
-                counter = 0
-                Do While (EndSub < NumofSub) ' Inner loop.
-                    EndSub = FormIn.Cells(Row, col + 1).Value2
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    If EndSub < NumofSub Then Row = Row + 1
-                    NextRow = NextRow + 1
-                    counter = counter + 1
-                    If counter > 99 Then
-                        MsgBox "Error in Form 3E, Ending Sub-Segment Number"
-                        End
-                    End If
-                Loop
-                Row = Row - counter + 1
-            'Form 3F
-                col = col + NumCol
-                NumCol = 7
-                If ECL = 1 Or ECL = 2 Then
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                NextRow = NextRow + 1            'Move one cell down for Output Sheet
+                If counter > 99 Then
+                    MsgBox "Error in Form 3D, Ending Sub-Segment Number"
+                    End
                 End If
-            'Restart at Form 3A, First figure out line to start
-                R_off = 1 'Need to figure out the starting row
-                If R_off < counter Then R_off = counter
-                If R_off < NumofSSHS Then R_off = NumofSSHS
-                col = 2
-                Row = Row + R_off
-            Loop
-        ' Form 4
-            WriteForm.TextBox2.Value = "Producing Form 4"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F04")
-            'Set FormRange = FormIn.Range("A1:AX1500")
-            Row = 5 'Starting Row
-            If NumUnsteady > 0 Then
-                Do While FormIn.Cells(Row, col) <> ""
-                    NextCol = 1
-                    col = 2 'Starting Column
-                    'Form 4 Line 1, Write Source Name
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, 1)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
-                    'Form 4 Line 1, Write Location and Subsegement
-                    col = col + 1
-                    NextCol = 5
-                    NumCol = 2
-                    Output.Range(Output.Cells(NextRow, NextCol), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    'Form 4 Line 2
-                    NextRow = NextRow + 1
-                    col = col + NumCol
-                    NumCol = 6
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1
-                    Row = Row + 1
-                Loop
-            End If
-        ' Form 5
-            WriteForm.TextBox2.Value = "Producing Form 5"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F05")
-            Row = 5 'Starting Row
-            Do While FormIn.Cells(Row, col) <> ""
-            'start of loop
-            'Form 5A
-                col = 2
-                NumCol = 3
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                segtype = FormIn.Cells(Row, 3)
-                'If FormIn.Cells(Row, 3) > 2 Then MsgBox "This spreadsheet does not support Vent shaft types other than 1 and 2. Updates coming."
-            'Form 5B
-                col = col + NumCol 'Starting point for column
-                NumCol = 8 'Number of columns in this line of the form
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NumofSub = FormIn.Cells(Row, 5).Value2
-                NextRow = NextRow + 1
-            'Form 5C
-                If segtype <> 3 Then 'If segement type is not type 3
-                    col = col + NumCol
-                Else: col = col + NumCol + 4
-                End If
-                NumCol = 4
-                If .Worksheets("F01").Range("D40").Value2 > 0 Then
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1
-                End If
-            'Form 5D
-                If segtype <> 3 Then
-                    col = col + NumCol + 4
-                Else: col = col + NumCol
-                End If
-                NumCol = 7
-                counter = 1
-                Do While ((counter < NumofSub) Or (counter = NumofSub)) ' Inner loop.
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1 'Move one cell down for Output Sheet
-                    If counter > 99 Then
-                        MsgBox "Error in Form 3D, Ending Sub-Segment Number"
-                        End
-                    End If
-                    Row = Row + 1
-                    counter = counter + 1
-                Loop
-                'Restart at Form 5A, First figure out line to start
-                If counter = 1 Then Row = Row + 1
-            Loop
-        'Form 6
-            WriteForm.TextBox2.Value = "Producing Form 6"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F06")
-            col = 2
-            Row = 5 'Starting Row
-            Do While FormIn.Cells(Row, col) <> ""
-            'start of loop
-            'Form 6A
-                NumCol = 3
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NAeroType = FormIn.Cells(Row, col + 1).Value2
-                NThermoType = FormIn.Cells(Row, col + 2).Value2
-                NextRow = NextRow + 1
-            'Form 6B Boundary Conditions (if Applicable)
-                If NThermoType = 3 Then
-                    col = 5
-                    NumCol = 6
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1
-                End If
-                Select Case NAeroType
-                Case 0, 7
-                    NumCol = -1 'This will skip writing the line
-                Case 1    'tunnel to tunnel crossover juction
-                    col = 11 'Row K value corrected in 0p09
-                    NumCol = 5 'Five data points
-                Case 2    'dividing wall termination junction
-                    col = 16 'Row p
-                    NumCol = 3 'Five data points
-                Case 3    '"T" Junction
-                    col = 19 'S
-                    NumCol = 4
-                Case 4    'angled junction
-                    col = 23 'w
-                    NumCol = 5
-                Case 5    '"Y"Junction
-                    col = 28
-                    NumCol = 5
-                Case 6    'Saccardo Nozzle
-                    col = 40  'Column AN
-                    NumCol = 6
-                Case 7    'zero total pressure change jucntion
-                    NumCol = -1
-                Case 8    'PSD Junction
-                    col = 46 'AT
-                    NumCol = 6
-                Case Else    ' Other values.
-                    MsgBox "Error in Form 6, Node Type does not exist"
-                End Select
-                If NumCol > 0 Then
-                    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                    NextRow = NextRow + 1
-                End If
-                col = 2
                 Row = Row + 1
-            Loop 'Loop for Nodes on Form 6
-            'Form 7A and B
-            WriteForm.TextBox2.Value = "Producing Form 7A and 7B"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F07")
+                counter = counter + 1
+            Loop
+            Row = Row - counter + 1              'Resets Row back to start
+            'Form 3E
+            col = col + NumCol
+            NumCol = 5
+            EndSub = 0
+            counter = 0
+            Do While (EndSub < NumofSub)         ' Inner loop.
+                EndSub = FormIn.Cells(Row, col + 1).Value2
+                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                If EndSub < NumofSub Then Row = Row + 1
+                NextRow = NextRow + 1
+                counter = counter + 1
+                If counter > 99 Then
+                    MsgBox "Error in Form 3E, Ending Sub-Segment Number"
+                    End
+                End If
+            Loop
+            Row = Row - counter + 1
+            'Form 3F
+            col = col + NumCol
+            NumCol = 7
+            If ECL = 1 Or ECL = 2 Then
+                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                NextRow = NextRow + 1
+            End If
+            'Restart at Form 3A, First figure out line to start
+            R_off = 1                            'Need to figure out the starting row
+            If R_off < counter Then R_off = counter
+            If R_off < NumofSSHS Then R_off = NumofSSHS
             col = 2
-            Row = 5 'Starting Row
+            Row = Row + R_off
+        Loop
+        ' Form 4
+        WriteForm.TextBox2.Value = "Producing Form 4"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F04")
+        'Set FormRange = FormIn.Range("A1:AX1500")
+        Row = 5                                  'Starting Row
+        If NumUnsteady > 0 Then
             Do While FormIn.Cells(Row, col) <> ""
-                'Form 7A Line 1, Write Source Name
+                NextCol = 1
+                col = 2                          'Starting Column
+                'Form 4 Line 1, Write Source Name
                 Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, 1)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
-                'Form 7A Line 1, Write Location and Subsegement
+                                                                                        FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
+                'Form 4 Line 1, Write Location and Subsegement
                 col = col + 1
                 NextCol = 5
-                NumCol = 4
+                NumCol = 2
                 Output.Range(Output.Cells(NextRow, NextCol), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                                                                                                                 FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                'Form 4 Line 2
                 NextRow = NextRow + 1
-                'Form 7B Line 1
                 col = col + NumCol
-                NumCol = 8
+                NumCol = 6
                 Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                'Form 7B Line 2
-                col = col + NumCol
-                NumCol = 8
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                Row = Row + 1 'Move one row down
-                col = 2 'Reset Column
-            Loop
-            'Form 7C
-            WriteForm.TextBox2.Value = "Producing Form 7C"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F07C")
-            col = 2
-            Row = 5 'Starting Row
-            Do While FormIn.Cells(Row, col) <> ""
-                'Form 7C Line 1
-                NumCol = 7
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                Row = Row + 1 'Move one row down
-                col = 2 'Reset Column
-            Loop
-            'Form 7D needs to be inputted here
-            WriteForm.TextBox2.Value = "Producing Form 7D"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F07D")
-            col = 2
-            Row = 5 'Starting Row
-            Do While FormIn.Cells(Row, col) <> ""
-                'Form 7D Line 1
-                NumCol = 8
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-                NextRow = NextRow + 1
-                Row = Row + 1 'Move one row down
-            Loop
-            'Form 8
-            If TPO > 0 Then
-                WriteForm.TextBox2.Value = "Producing Form 8"
-                WriteForm.Repaint
-                Call WriteForm8
-            End If 'If statement to skip Form 9 if train performance option is 0
-            'Form 9
-            If TPO > 0 Then
-                WriteForm.TextBox2.Value = "Producing Form 9"
-                WriteForm.Repaint
-                Call WriteForm9(NextRow)
-            End If 'If statement to skip Form 9 if train performance option is 0
-            'Form 10
-            WriteForm.TextBox2.Value = "Producing Form 10"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F10")
-            col = 2
-            Row = 5 'Starting Row
-            NumCol = 8
-            Do While FormIn.Cells(Row, col) <> ""
-                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
                 NextRow = NextRow + 1
                 Row = Row + 1
             Loop
-            'Form 11
-            WriteForm.TextBox2.Value = "Producing Form 11"
-            WriteForm.Repaint
-            Call WriteForm11
-            'Form 12
-            Set FormIn = .Worksheets("F12")
-            WriteForm.TextBox2.Value = "Producing Form 12"
-            WriteForm.Repaint
-            NumData = 2
-            Row = 2
-            col = 4
-            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData - 1, col)).Value2)
-            'Form 12 Second and beyond entries
-            NumPrint = FormIn.Cells(3, 4).Value2
+        End If
+        ' Form 5
+        WriteForm.TextBox2.Value = "Producing Form 5"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F05")
+        Row = 5                                  'Starting Row
+        Do While FormIn.Cells(Row, col) <> ""
+            'start of loop
+            'Form 5A
+            col = 2
+            NumCol = 3
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
             NextRow = NextRow + 1
-            col = 2
-            Row = 5
-            NumCol = 7
-            With FormIn
-                Set FormRange = .Range(.Cells(Row, col), .Cells(Row + NumPrint - 1, col + NumCol - 1))
-            End With
-            With Output
-                .Range(.Cells(NextRow, 1), .Cells(NextRow + NumPrint - 1, NumCol)).Value2 = FormRange.Value2
-            End With
-            NextRow = NextRow + NumPrint
-            'Form 13
-            WriteForm.TextBox2.Value = "Producing Form 13"
-            WriteForm.Repaint
-            Set FormIn = .Worksheets("F13")
-            col = 2
-            Row = 4 'Starting Row of Form
+            segtype = FormIn.Cells(Row, 3)
+            'If FormIn.Cells(Row, 3) > 2 Then MsgBox "This spreadsheet does not support Vent shaft types other than 1 and 2. Updates coming."
+            'Form 5B
+            col = col + NumCol                   'Starting point for column
+            NumCol = 8                           'Number of columns in this line of the form
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NumofSub = FormIn.Cells(Row, 5).Value2
+            NextRow = NextRow + 1
+            'Form 5C
+            If segtype <> 3 Then                 'If segement type is not type 3
+                col = col + NumCol
+            Else: col = col + NumCol + 4
+            End If
             NumCol = 4
-            Do While FormIn.Cells(Row, col) <> ""
+            If .Worksheets("F01").Range("D40").Value2 > 0 Then
                 Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
                 NextRow = NextRow + 1
-                Row = Row + 1 'move a row down on Form 11A
+            End If
+            'Form 5D
+            If segtype <> 3 Then
+                col = col + NumCol + 4
+            Else: col = col + NumCol
+            End If
+            NumCol = 7
+            counter = 1
+            Do While ((counter < NumofSub) Or (counter = NumofSub)) ' Inner loop.
+                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                NextRow = NextRow + 1            'Move one cell down for Output Sheet
+                If counter > 99 Then
+                    MsgBox "Error in Form 3D, Ending Sub-Segment Number"
+                    End
+                End If
+                Row = Row + 1
+                counter = counter + 1
             Loop
-            'Form 14
-            If CPipe > 0 Then
-                WriteForm.TextBox2.Value = "Producing Form 14"
-                WriteForm.Repaint
-                Call WriteForm14
+            'Restart at Form 5A, First figure out line to start
+            If counter = 1 Then Row = Row + 1
+        Loop
+        'Form 6
+        WriteForm.TextBox2.Value = "Producing Form 6"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F06")
+        col = 2
+        Row = 5                                  'Starting Row
+        Do While FormIn.Cells(Row, col) <> ""
+            'start of loop
+            'Form 6A
+            NumCol = 3
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NAeroType = FormIn.Cells(Row, col + 1).Value2
+            NThermoType = FormIn.Cells(Row, col + 2).Value2
+            NextRow = NextRow + 1
+            'Form 6B Boundary Conditions (if Applicable)
+            If NThermoType = 3 Then
+                col = 5
+                NumCol = 6
+                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                NextRow = NextRow + 1
             End If
-            'Restart File
-            If InitialReadOption <> 0 Then
-                Output.Cells(NextRow, 1).Value2 = InitialFileName
+            Select Case NAeroType
+            Case 0, 7
+                NumCol = -1                      'This will skip writing the line
+            Case 1                               'tunnel to tunnel crossover juction
+                col = 11                         'Row K value corrected in 0p09
+                NumCol = 5                       'Five data points
+            Case 2                               'dividing wall termination junction
+                col = 16                         'Row p
+                NumCol = 3                       'Five data points
+            Case 3                               '"T" Junction
+                col = 19                         'S
+                NumCol = 4
+            Case 4                               'angled junction
+                col = 23                         'w
+                NumCol = 5
+            Case 5                               '"Y"Junction
+                col = 28
+                NumCol = 5
+            Case 6                               'Saccardo Nozzle
+                col = 40                         'Column AN
+                NumCol = 6
+            Case 7                               'zero total pressure change jucntion
+                NumCol = -1
+            Case 8                               'PSD Junction
+                col = 46                         'AT
+                NumCol = 6
+            Case Else                            ' Other values.
+                MsgBox "Error in Form 6, Node Type does not exist"
+            End Select
+            If NumCol > 0 Then
+                Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+                NextRow = NextRow + 1
             End If
+            col = 2
+            Row = Row + 1
+        Loop                                     'Loop for Nodes on Form 6
+        'Form 7A and B
+        WriteForm.TextBox2.Value = "Producing Form 7A and 7B"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F07")
+        col = 2
+        Row = 5                                  'Starting Row
+        Do While FormIn.Cells(Row, col) <> ""
+            'Form 7A Line 1, Write Source Name
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, 1)).Value2 = _
+                                                                                    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
+            'Form 7A Line 1, Write Location and Subsegement
+            col = col + 1
+            NextCol = 5
+            NumCol = 4
+            Output.Range(Output.Cells(NextRow, NextCol), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
+                                                                                                             FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            'Form 7B Line 1
+            col = col + NumCol
+            NumCol = 8
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            'Form 7B Line 2
+            col = col + NumCol
+            NumCol = 8
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            Row = Row + 1                        'Move one row down
+            col = 2                              'Reset Column
+        Loop
+        'Form 7C
+        WriteForm.TextBox2.Value = "Producing Form 7C"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F07C")
+        col = 2
+        Row = 5                                  'Starting Row
+        Do While FormIn.Cells(Row, col) <> ""
+            'Form 7C Line 1
+            NumCol = 7
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            Row = Row + 1                        'Move one row down
+            col = 2                              'Reset Column
+        Loop
+        'Form 7D needs to be inputted here
+        WriteForm.TextBox2.Value = "Producing Form 7D"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F07D")
+        col = 2
+        Row = 5                                  'Starting Row
+        Do While FormIn.Cells(Row, col) <> ""
+            'Form 7D Line 1
+            NumCol = 8
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            Row = Row + 1                        'Move one row down
+        Loop
+        'Form 8
+        If TPO > 0 Then
+            WriteForm.TextBox2.Value = "Producing Form 8"
+            WriteForm.Repaint
+            Call WriteForm8
+        End If                                   'If statement to skip Form 9 if train performance option is 0
+        'Form 9
+        If TPO > 0 Then
+            WriteForm.TextBox2.Value = "Producing Form 9"
+            WriteForm.Repaint
+            Call WriteForm9(NextRow)
+        End If                                   'If statement to skip Form 9 if train performance option is 0
+        'Form 10
+        WriteForm.TextBox2.Value = "Producing Form 10"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F10")
+        col = 2
+        Row = 5                                  'Starting Row
+        NumCol = 8
+        Do While FormIn.Cells(Row, col) <> ""
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            Row = Row + 1
+        Loop
+        'Form 11
+        WriteForm.TextBox2.Value = "Producing Form 11"
+        WriteForm.Repaint
+        Call WriteForm11
+        'Form 12
+        Set FormIn = .Worksheets("F12")
+        WriteForm.TextBox2.Value = "Producing Form 12"
+        WriteForm.Repaint
+        NumData = 2
+        Row = 2
+        col = 4
+        Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumData)).Value2 = _
+                                                                                      Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData - 1, col)).Value2)
+        'Form 12 Second and beyond entries
+        NumPrint = FormIn.Cells(3, 4).Value2
+        NextRow = NextRow + 1
+        col = 2
+        Row = 5
+        NumCol = 7
+        With FormIn
+            Set FormRange = .Range(.Cells(Row, col), .Cells(Row + NumPrint - 1, col + NumCol - 1))
+        End With
+        With Output
+            .Range(.Cells(NextRow, 1), .Cells(NextRow + NumPrint - 1, NumCol)).Value2 = FormRange.Value2
+        End With
+        NextRow = NextRow + NumPrint
+        'Form 13
+        WriteForm.TextBox2.Value = "Producing Form 13"
+        WriteForm.Repaint
+        Set FormIn = .Worksheets("F13")
+        col = 2
+        Row = 4                                  'Starting Row of Form
+        NumCol = 4
+        Do While FormIn.Cells(Row, col) <> ""
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
+                                                                                         FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            NextRow = NextRow + 1
+            Row = Row + 1                        'move a row down on Form 11A
+        Loop
+        'Form 14
+        If CPipe > 0 Then
+            WriteForm.TextBox2.Value = "Producing Form 14"
+            WriteForm.Repaint
+            Call WriteForm14
+        End If
+        'Restart File
+        If InitialReadOption <> 0 Then
+            Output.Cells(NextRow, 1).Value2 = InitialFileName
+        End If
     End With
-    Call FormatINP 'Adjust width and alignment of text
+    Call FormatINP                               'Adjust width and alignment of text
     WriteForm.TextBox2.Value = "Formatting Numbers"
     WriteForm.Repaint
-    Call FormatNumbersArray 'Adjust numerical format
+    Call FormatNumbersArray                      'Adjust numerical format
     EndTime = Timer
     Debug.Print unit_name & " Time after formating before save: " & (EndTime - StartTime)
     WriteForm.TextBox2.Value = "Exporting File"
-    Call Speedon(False) 'Enable items that previously slowed down processing.
+    Call Speedon(False)                          'Enable items that previously slowed down processing.
     If unit_name = "" Then
-        Call WriteINP     'Write out file to text file
+        Call WriteINP                            'Write out file to text file
     Else
         Call WriteINP(unit_name)
     End If
     WriteForm.Hide
-  Exit Sub
+    Exit Sub
 ErrorProc:
-  Speedon (False)
-  MsgBox "Error in procedure Write File : " & Err.Description
-  Err.Clear
+    Speedon (False)
+    MsgBox "Error in procedure Write File : " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub WriteINP(Optional unit_name As String)
-  On Error GoTo ErrorProc
-  Dim SaveName As String
-  If unit_name = "" Then
+    On Error GoTo ErrorProc
+    Dim SaveName As String
+    If unit_name = "" Then
         SaveName = Application.GetSaveAsFilename(fileFilter:="SES V6 Input File (*.inp), *.inp", Title:="Save SES Input File")
-  Else
-        SaveName = unit_name
-  End If
-  If (Trim(SaveName) <> "" And SaveName <> "False") Then
-    Application.DisplayAlerts = True
-    ThisWorkbook.Sheets("Output").Copy
-    ActiveWorkbook.SaveAs FileName:=SaveName, FileFormat:=xlTextPrinter, CreateBackup:=False
-    ActiveWorkbook.Close
-    Application.DisplayAlerts = True
-    If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then 'Change sheet to last version written
-        Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
     Else
-        Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
+        SaveName = unit_name
     End If
-    Workbooks(wname).Worksheets("Control").Range("H20").Value2 = SaveName 'Change sheet to say last saved
-    Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
-    If Workbooks(wname).Worksheets("Control").CheckBox1.Value = True Then
-        If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then
-            CallSES (SaveName)
+    If (Trim(SaveName) <> "" And SaveName <> "False") Then
+        Application.DisplayAlerts = True
+        ThisWorkbook.Sheets("Output").Copy
+        ActiveWorkbook.SaveAs FileName:=SaveName, FileFormat:=xlTextPrinter, CreateBackup:=False
+        ActiveWorkbook.Close
+        Application.DisplayAlerts = True
+        If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then 'Change sheet to last version written
+            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
         Else
-            CallSES41 (SaveName)
+            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
+        End If
+        Workbooks(wname).Worksheets("Control").Range("H20").Value2 = SaveName 'Change sheet to say last saved
+        Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+        If Workbooks(wname).Worksheets("Control").CheckBox1.Value = True Then
+            If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then
+                CallSES (SaveName)
+            Else
+                CallSES41 (SaveName)
+            End If
         End If
     End If
-  End If
-  Exit Sub
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure WriteIMP: " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure WriteIMP: " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub CallSES(path As String)
-  On Error GoTo ErrorProc
-      WriteForm.TextBox2.Value = "Attempting to run SES v6"
-      WriteForm.Repaint
-      Call Shell("SVSV6_32.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
-  Exit Sub
+    On Error GoTo ErrorProc
+    WriteForm.TextBox2.Value = "Attempting to run SES v6"
+    WriteForm.Repaint
+    Call Shell("SVSV6_32.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure CallSES: " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure CallSES: " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub CallSES41(path As String)
-  On Error GoTo ErrorProc
-      WriteForm.TextBox2.Value = "Attempting to run SES 4.1 on IP File"
-      WriteForm.Repaint
-      Call Shell("SES41.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
-  Exit Sub
+    On Error GoTo ErrorProc
+    WriteForm.TextBox2.Value = "Attempting to run SES 4.1 on IP File"
+    WriteForm.Repaint
+    Call Shell("SES41.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure CallSES: " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure CallSES: " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub FormatINP()
-'Left justify and create the write width
-  On Error GoTo ErrorProc
-  Workbooks(wname).Worksheets("Output").Columns("A:H").HorizontalAlignment = xlLeft
-  Workbooks(wname).Worksheets("Output").Columns("A:H").ColumnWidth = 10.29
-  Exit Sub
+    'Left justify and create the write width
+    On Error GoTo ErrorProc
+    Workbooks(wname).Worksheets("Output").Columns("A:H").HorizontalAlignment = xlLeft
+    Workbooks(wname).Worksheets("Output").Columns("A:H").ColumnWidth = 10.29
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure FormatINP: " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure FormatINP: " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub FormatNumbersArray()
-'Format numbers
-  On Error GoTo ErrorProc
-  Dim OutputArray() As Variant
-  Dim OutputRange As Object
-  Dim J As Integer
-  With Workbooks(wname).Worksheets("Output")
-    LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
-    Set OutputRange = .Range(.Cells(1, 1), .Cells(LastRow, 8))
-    OutputArray = OutputRange.Value2
-    OutputRange.NumberFormat = "0.#######"
-    For i = LBound(OutputArray, 1) To UBound(OutputArray, 1)
-      For J = LBound(OutputArray, 2) To UBound(OutputArray, 2)
-        If Not IsEmpty(OutputArray(i, J)) And IsNumeric(OutputArray(i, J)) Then
-            If (Abs(OutputArray(i, J)) > 99999999) Or ((Abs(OutputArray(i, J)) < 0.00001) And (OutputArray(i, J) <> 0)) Then
-              'If value is greater than 8 places or smaller then 5 decimal places
-              OutputRange(i, J).NumberFormat = "0.000E+00"
-            ElseIf Len(OutputRange(i, J)) > 9 Then 'If the value is longer than 9 places
-                Select Case OutputArray(i, J)
-                Case Is > 10000000
-                    OutputRange(i, J).NumberFormat = "0."
-                Case Is > 1000000
-                    OutputRange(i, J).NumberFormat = "0.#"
-                Case Is > 100000
-                    OutputRange(i, J).NumberFormat = "0.##"
-                Case Is > 10000
-                    OutputRange(i, J).NumberFormat = "0.###"
-                Case Is > 1000
-                    OutputRange(i, J).NumberFormat = "0.####"
-                Case Is > 100
-                    OutputRange(i, J).NumberFormat = "0.#####"
-                Case Is > 10
-                    OutputRange(i, J).NumberFormat = "0.######"
-                Case Is > 1
-                    OutputRange(i, J).NumberFormat = "0.#######"
-                End Select
-           End If
-        End If
-      Next J
-    Next i
-  End With
-  Exit Sub
+    'Format numbers
+    On Error GoTo ErrorProc
+    Dim OutputArray() As Variant
+    Dim OutputRange As Object
+    Dim J As Integer
+    With Workbooks(wname).Worksheets("Output")
+        LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+        Set OutputRange = .Range(.Cells(1, 1), .Cells(LastRow, 8))
+        OutputArray = OutputRange.Value2
+        OutputRange.NumberFormat = "0.#######"
+        For i = LBound(OutputArray, 1) To UBound(OutputArray, 1)
+            For J = LBound(OutputArray, 2) To UBound(OutputArray, 2)
+                If Not IsEmpty(OutputArray(i, J)) And IsNumeric(OutputArray(i, J)) Then
+                    If (Abs(OutputArray(i, J)) > 99999999) Or ((Abs(OutputArray(i, J)) < 0.00001) And (OutputArray(i, J) <> 0)) Then
+                        'If value is greater than 8 places or smaller then 5 decimal places
+                        OutputRange(i, J).NumberFormat = "0.000E+00"
+                    ElseIf Len(OutputRange(i, J)) > 9 Then 'If the value is longer than 9 places
+                        Select Case OutputArray(i, J)
+                        Case Is > 10000000
+                            OutputRange(i, J).NumberFormat = "0."
+                        Case Is > 1000000
+                            OutputRange(i, J).NumberFormat = "0.#"
+                        Case Is > 100000
+                            OutputRange(i, J).NumberFormat = "0.##"
+                        Case Is > 10000
+                            OutputRange(i, J).NumberFormat = "0.###"
+                        Case Is > 1000
+                            OutputRange(i, J).NumberFormat = "0.####"
+                        Case Is > 100
+                            OutputRange(i, J).NumberFormat = "0.#####"
+                        Case Is > 10
+                            OutputRange(i, J).NumberFormat = "0.######"
+                        Case Is > 1
+                            OutputRange(i, J).NumberFormat = "0.#######"
+                        End Select
+                    End If
+                End If
+            Next J
+        Next i
+    End With
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure FormatNumberArray : " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure FormatNumberArray : " & Err.Description
+    Err.Clear
 End Sub
 
 Public Sub Speedon(ByVal SetOn As Boolean)
-'Turns on the time wasters
-  On Error GoTo ErrorProc
-  With Application
-    If SetOn Then
-        .Calculation = xlCalculationManual
-        .ScreenUpdating = False
-        .EnableEvents = False
-        .DisplayAlerts = False
-        .Cursor = xlWait
-        .DisplayStatusBar = True
-        .StatusBar = "Next-In Working..."
-    Else
-        .Calculation = xlCalculationAutomatic
-        .ScreenUpdating = True
-        .EnableEvents = True
-        .DisplayAlerts = True
-        .Cursor = xlDefault
-        .StatusBar = False
-    End If
-  End With
-  Exit Sub
+    'Turns on the time wasters
+    On Error GoTo ErrorProc
+    With Application
+        If SetOn Then
+            .Calculation = xlCalculationManual
+            .ScreenUpdating = False
+            .EnableEvents = False
+            .DisplayAlerts = False
+            .Cursor = xlWait
+            .DisplayStatusBar = True
+            .StatusBar = "Next-In Working..."
+        Else
+            .Calculation = xlCalculationAutomatic
+            .ScreenUpdating = True
+            .EnableEvents = True
+            .DisplayAlerts = True
+            .Cursor = xlDefault
+            .StatusBar = False
+        End If
+    End With
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure Speedon, hit Reset : " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure Speedon, hit Reset : " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub WriteForm9(OutRow)
-  On Error GoTo ErrorProc
+    On Error GoTo ErrorProc
     col = 6
-    Row = 3 'Starting Row
+    Row = 3                                      'Starting Row
     Set FormIn = Workbooks(wname).Worksheets("F09")
     Do While FormIn.Cells(Row, col) <> ""
         'Test code
@@ -722,138 +723,138 @@ Private Sub WriteForm9(OutRow)
         WriteForm.Repaint
         'Form 9A Line 1, Write Source Name
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, 1)).Value2 = _
-        FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
+                                                                              FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
         'Form 9A Line 1, Write Location and Subsegement
         Row = Row + 1
         NextCol = 5
         NumData = 4
         Output.Range(Output.Cells(OutRow, NextCol), Output.Cells(OutRow, NextCol + NumData - 1)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData - 1, col)).Value2)
+                                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData - 1, col)).Value2)
         OutRow = OutRow + 1
         'Form 9B
         Row = Row + NumData
         NumData = 5
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                    Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         OutRow = OutRow + 1
         'Form 9C
         Row = Row + NumData
         NumData = 6
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                    Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         OutRow = OutRow + 1
         'Form 9D Line1
         Row = Row + NumData
         NumData = 8
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                    Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         OutRow = OutRow + 1
         'Form 9D Line2
         Row = Row + NumData
         NumData = 8
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                    Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         OutRow = OutRow + 1
         'Form 9E
         Row = Row + NumData
         NumData = 6
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                    Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
         OutRow = OutRow + 1
         If TPO <> 3 Then
             'Form 9F Line 1, Write Source Name
             Row = Row + NumData
             NumData = 1
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, 1)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2)
+                                                                                  Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2)
             'Form 9F Line 1, Write Location and Subsegement
             Row = Row + 1
             NextCol = 5
             NumData = 2
             Output.Range(Output.Cells(OutRow, NextCol), Output.Cells(OutRow, NextCol + NumData - 1)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             'Form 9F Line 2, Write Location and Subsegement
             Row = Row + NumData
             NumData = 5
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             'Form 9G Line 1
             Row = Row + NumData
             NumData = 4
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             'Form 9G Line 2
             Row = Row + NumData
             NumData = 4
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             'Form 9G Line 3
             Row = Row + NumData
             NumData = 4
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             'Form 9G Line 3
             Row = Row + NumData
             NumData = 1
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             TCO = Int(FormIn.Cells(Row, col).Value2) 'Train Control Option
             If TCO = 2 Then
-            'Form 9H Line 1 Train Controller
+                'Form 9H Line 1 Train Controller
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
                 'Form 9H Line 2
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
                 OFSO = FormIn.Cells(Row + 4, col) 'onboard Flyewheel simulation option
             Else
                 Row = Row + 5
-                OFSO = 1 'set onboard flywhell simulation option to bypass
+                OFSO = 1                         'set onboard flywhell simulation option to bypass
             End If
             If TCO = 3 Then
                 'Form 9H-A Line 1
                 Row = 72
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
                 'Form 9H-A Line 2
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
                 'Form 9H-A Line 3
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
             End If
             'Form 9I Line 1
             Row = 87
             NumData = 5
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                        Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
             If TPO = 1 Then
-            'Form 9J Line 1
+                'Form 9J Line 1
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
             Else: Row = Row + 5
             End If
@@ -862,200 +863,197 @@ Private Sub WriteForm9(OutRow)
                 Row = Row + NumData
                 NumData = 5
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
                 'Form 9L Line 1
                 Row = Row + NumData
                 NumData = 7
                 Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
-                Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
+                                                                                            Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
                 OutRow = OutRow + 1
             End If
         End If
         'Reset to read next column
-        col = col + 1 'Move one row over
-        Row = 3 'Reset Column
+        col = col + 1                            'Move one row over
+        Row = 3                                  'Reset Column
     Loop
     NextRow = OutRow
-  Exit Sub
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure WriteForm9 : " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure WriteForm9 : " & Err.Description
+    Err.Clear
 End Sub
 
-
-
 Private Sub WriteForm14()
-  On Error GoTo ErrorProc
-  Dim i As Integer
-  Dim RowF14C As Integer
-  Dim ColF14C As Integer
-  Dim NumInlet As Integer
-  Dim numSec As Integer
-  Dim SNum As Integer
+    On Error GoTo ErrorProc
+    Dim i As Integer
+    Dim RowF14C As Integer
+    Dim ColF14C As Integer
+    Dim NumInlet As Integer
+    Dim numSec As Integer
+    Dim SNum As Integer
   
-'NumPipes is the number of cool pies to read in
-  Set FormIn = Workbooks(wname).Worksheets("F14AB")
-  Set F14C = Workbooks(wname).Worksheets("F14C")
-  Set Output = Workbooks(wname).Worksheets("Output")
-  Row = 4 'Starting Row 14AB
-  col = 2 'Starting Row 14AB
-  RowF14C = 4 'Starting Row 14C
-  ColF14C = 2 'Starting Row 14C
-  Do While FormIn.Cells(Row, col) <> ""
-    col = 2 'Starting Column
-'Form 14A Line 1, Write Cooling Pipe Description
-    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, 1)).Value2 = _
-    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
-    NextRow = NextRow + 1
-'Form 14A Line 2, Write Location and Subsegement
-    col = col + 1
-    NextCol = 1
-    NumCol = 7
-    Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
-    FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-    NumInlet = FormIn.Cells(Row, 3).Value2
-    numSec = FormIn.Cells(Row, 4).Value2
-    NextRow = NextRow + 1
-    'Form 14B Line3 and all inlet IDs
-    For i = 1 To NumInlet
-        NextCol = 1
-        NumCol = 3
-        col = 10
-        Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
-        FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
-        Row = Row + 1 'Advance down a row on Form 14 AB
+    'NumPipes is the number of cool pies to read in
+    Set FormIn = Workbooks(wname).Worksheets("F14AB")
+    Set F14C = Workbooks(wname).Worksheets("F14C")
+    Set Output = Workbooks(wname).Worksheets("Output")
+    Row = 4                                      'Starting Row 14AB
+    col = 2                                      'Starting Row 14AB
+    RowF14C = 4                                  'Starting Row 14C
+    ColF14C = 2                                  'Starting Row 14C
+    Do While FormIn.Cells(Row, col) <> ""
+        col = 2                                  'Starting Column
+        'Form 14A Line 1, Write Cooling Pipe Description
+        Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, 1)).Value2 = _
+                                                                                FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col)).Value2
         NextRow = NextRow + 1
-    Next i
-      'Form 14C which needs to include + or - sign
-      Dim NumArray() As Variant
-      numSec = 1
-      If numSec > 1 Then
-          NumArray = F14C.Range(F14C.Cells(RowF14C, ColF14C), F14C.Cells(RowF14C + numSec - 1, ColF14C)).Value2
-          'ActiveCell.Value2 = F14C.Range(F14C.Cells(RowF14C, ColF14C), F14C.Cells(RowF14C + NumSec - 1, ColF14C)).Value2
-          'NumArray() = Range("B4:B5").Value2
-          'Create String Array with + or -. Values are entered as strings faster than entering the value for each cell
-          For i = LBound(NumArray) To UBound(NumArray)
-              If NumArray(i, 1) > 0 Then
-                  Output.Cells(NextRow, 1).Value2 = "'+" & CStr(NumArray(i, 1)) & "."
-              Else
-                  Output.Cells(NextRow, 1).Value2 = "'" & CStr(NumArray(i, 1)) & "."
-              End If
-              NextRow = NextRow + 1
-          Next i
-          Erase NumArray
-      ElseIf numSec = 1 Then
-          SNum = Int(F14C.Cells(RowF14C, ColF14C).Value2)
-          If SNum > 0 Then
-              Output.Cells(NextRow, 1).Value2 = "'+" & SNum & "."
-          Else
-              Output.Cells(NextRow, 1).Value2 = "'" & SNum & "."
-          End If
-          NextRow = NextRow + 1
-      End If
-      ColF14C = ColF14C + 1
-      'remember to delete arrays
-  Loop
-  Exit Sub
+        'Form 14A Line 2, Write Location and Subsegement
+        col = col + 1
+        NextCol = 1
+        NumCol = 7
+        Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
+                                                                                                   FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+        NumInlet = FormIn.Cells(Row, 3).Value2
+        numSec = FormIn.Cells(Row, 4).Value2
+        NextRow = NextRow + 1
+        'Form 14B Line3 and all inlet IDs
+        For i = 1 To NumInlet
+            NextCol = 1
+            NumCol = 3
+            col = 10
+            Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NextCol + NumCol - 1)).Value2 = _
+                                                                                                       FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row, col + NumCol - 1)).Value2
+            Row = Row + 1                        'Advance down a row on Form 14 AB
+            NextRow = NextRow + 1
+        Next i
+        'Form 14C which needs to include + or - sign
+        Dim NumArray() As Variant
+        numSec = 1
+        If numSec > 1 Then
+            NumArray = F14C.Range(F14C.Cells(RowF14C, ColF14C), F14C.Cells(RowF14C + numSec - 1, ColF14C)).Value2
+            'ActiveCell.Value2 = F14C.Range(F14C.Cells(RowF14C, ColF14C), F14C.Cells(RowF14C + NumSec - 1, ColF14C)).Value2
+            'NumArray() = Range("B4:B5").Value2
+            'Create String Array with + or -. Values are entered as strings faster than entering the value for each cell
+            For i = LBound(NumArray) To UBound(NumArray)
+                If NumArray(i, 1) > 0 Then
+                    Output.Cells(NextRow, 1).Value2 = "'+" & CStr(NumArray(i, 1)) & "."
+                Else
+                    Output.Cells(NextRow, 1).Value2 = "'" & CStr(NumArray(i, 1)) & "."
+                End If
+                NextRow = NextRow + 1
+            Next i
+            Erase NumArray
+        ElseIf numSec = 1 Then
+            SNum = Int(F14C.Cells(RowF14C, ColF14C).Value2)
+            If SNum > 0 Then
+                Output.Cells(NextRow, 1).Value2 = "'+" & SNum & "."
+            Else
+                Output.Cells(NextRow, 1).Value2 = "'" & SNum & "."
+            End If
+            NextRow = NextRow + 1
+        End If
+        ColF14C = ColF14C + 1
+        'remember to delete arrays
+    Loop
+    Exit Sub
 ErrorProc:
-  MsgBox "Error in procedure WriteForm14 : " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure WriteForm14 : " & Err.Description
+    Err.Clear
 End Sub
 
 Private Sub WriteForm8()
 
-Dim Line8A As Long
-Dim Line8B As Long
-Dim Line8C As Long
-Dim Line8D As Long
-Dim Line8E As Long
-Dim Line8F As Long
-Dim Col8A As Long
-Dim Col8B As Long
-Dim Col8C As Long
-Dim Col8D As Long
-Dim Col8E As Long
-Dim Col8F As Long
-Dim numlines As Long
-Line8A = 5 'Starting line for Line 8A
-Line8B = 4 'Starting line for Line 8B
-Line8C = 5 'Starting line for Form 8C
-Line8D = 7 'Starting line for Form 8D
-Line8E = 6 'starting line for Form 8E
-Line8F = 5 'Starting line for Form 8F
-Col8A = 2 'starting column for Form 8A
-Col8B = 2 'starting column for Form 8B
-Col8C = 2 'starting column for Form 8C
-Col8D = 2 'starting column for Form 8D
-Col8E = 2 'starting column for Form 8E
-Col8F = 4 'starting column for form 8F
-Do While (Workbooks(wname).Worksheets("F08A").Cells(Line8A, 2).Value2 <> "")
-    'Form 8A
-    Set FormIn = Workbooks(wname).Worksheets("F08A")
-    col = Col8A
-    NumData = 1
-    Call Range2DSame(NextRow, 1, Line8A, col, 1, NumData, Output, FormIn)
-    col = col + NumData
-    NumData = 7
-    Call Range2DSame(NextRow, 1, Line8A, col, 1, NumData, Output, FormIn)
-    Range2D(NextRow, 1, NumData, 1, Output) = Range2D(Line8A, col, NumData, 1, FormIn)
-    numGroup = FormIn.Cells(Line8A, 4).Value2 'Number of train routes
-    NumTrack = FormIn.Cells(Line8A, 5).Value2 'Number of train routes
-    Line8A = Line8A + 1
-    'Form 8B
-    Set FormIn = Workbooks(wname).Worksheets("F08B")
-    NumData = 3
-    If numGroup > 1 Then
-        Call Range2DSame(NextRow, 1, Line8B, Col8B, numGroup - 1, 3, Output, FormIn)
-    End If
-    Col8B = Col8B + 3
-    'Form 8C
-    If TPO = 1 Or TPO = 2 Then
-        Set FormIn = Workbooks(wname).Worksheets("F08C")
-        NumData = 8
-        Call Range2DSame(NextRow, 1, Line8C, Col8C, NumTrack, NumData, Output, FormIn)
-        Col8C = Col8C + 8
-    End If
-    'Form 8D
-    If TPO = 1 Then
-        Set FormIn = Workbooks(wname).Worksheets("F08D")
-        'Form 8D first entry
-        NumData = 2
-        Call Vertical2Horizontal(NextRow, 1, Line8D - 5, Col8D + 2, 2, Output, FormIn)
-        numStops = FormIn.Cells(Line8D - 5, Col8D + 2).Value2
-        'Form 8D Second and beyond entries
+    Dim Line8A As Long
+    Dim Line8B As Long
+    Dim Line8C As Long
+    Dim Line8D As Long
+    Dim Line8E As Long
+    Dim Line8F As Long
+    Dim Col8A As Long
+    Dim Col8B As Long
+    Dim Col8C As Long
+    Dim Col8D As Long
+    Dim Col8E As Long
+    Dim Col8F As Long
+    Dim numlines As Long
+    Line8A = 5                                   'Starting line for Line 8A
+    Line8B = 4                                   'Starting line for Line 8B
+    Line8C = 5                                   'Starting line for Form 8C
+    Line8D = 7                                   'Starting line for Form 8D
+    Line8E = 6                                   'starting line for Form 8E
+    Line8F = 5                                   'Starting line for Form 8F
+    Col8A = 2                                    'starting column for Form 8A
+    Col8B = 2                                    'starting column for Form 8B
+    Col8C = 2                                    'starting column for Form 8C
+    Col8D = 2                                    'starting column for Form 8D
+    Col8E = 2                                    'starting column for Form 8E
+    Col8F = 4                                    'starting column for form 8F
+    Do While (Workbooks(wname).Worksheets("F08A").Cells(Line8A, 2).Value2 <> "")
+        'Form 8A
+        Set FormIn = Workbooks(wname).Worksheets("F08A")
+        col = Col8A
+        NumData = 1
+        Call Range2DSame(NextRow, 1, Line8A, col, 1, NumData, Output, FormIn)
+        col = col + NumData
+        NumData = 7
+        Call Range2DSame(NextRow, 1, Line8A, col, 1, NumData, Output, FormIn)
+        Range2D(NextRow, 1, NumData, 1, Output) = Range2D(Line8A, col, NumData, 1, FormIn)
+        numGroup = FormIn.Cells(Line8A, 4).Value2 'Number of train routes
+        NumTrack = FormIn.Cells(Line8A, 5).Value2 'Number of train routes
+        Line8A = Line8A + 1
+        'Form 8B
+        Set FormIn = Workbooks(wname).Worksheets("F08B")
         NumData = 3
-        If numStops > 0 Then
-            Call Range2DSame(NextRow, 1, Line8D, Col8D, numStops, NumData, Output, FormIn)
+        If numGroup > 1 Then
+            Call Range2DSame(NextRow, 1, Line8B, Col8B, numGroup - 1, 3, Output, FormIn)
         End If
-        Col8D = Col8D + 3
-    End If
-    'Form 8E
-    If TPO = 2 Or TPO = 3 Then
-        Set FormIn = Workbooks(wname).Worksheets("F08E")
-        numlines = FormIn.Cells(Line8E - 4, Col8E + 4).Value2 'number of spee-time points
-        Output.Cells(NextRow, 1).Value2 = numlines
-        NextRow = NextRow + 1
-        NumData = 5
-        Call Range2DSame(NextRow, 1, Line8E, Col8E, numlines, NumData, Output, FormIn)
-        Col8E = Col8E + 5
-    End If
-    'Form 8F
-    Set FormIn = Workbooks(wname).Worksheets("F08F")
-    NumData = 2
-    Call Vertical2Horizontal(NextRow, 1, Line8F - 3, Col8F, 2, Output, FormIn)
-    numSecs = FormIn.Cells(Line8F - 3, Col8F).Value2
-    NumData = 1
-    Call Range2DSame(NextRow, 1, Line8F, Col8F, numSecs, NumData, Output, FormIn)
-    Col8F = Col8F + 3
-Loop
-Exit Sub
+        Col8B = Col8B + 3
+        'Form 8C
+        If TPO = 1 Or TPO = 2 Then
+            Set FormIn = Workbooks(wname).Worksheets("F08C")
+            NumData = 8
+            Call Range2DSame(NextRow, 1, Line8C, Col8C, NumTrack, NumData, Output, FormIn)
+            Col8C = Col8C + 8
+        End If
+        'Form 8D
+        If TPO = 1 Then
+            Set FormIn = Workbooks(wname).Worksheets("F08D")
+            'Form 8D first entry
+            NumData = 2
+            Call Vertical2Horizontal(NextRow, 1, Line8D - 5, Col8D + 2, 2, Output, FormIn)
+            numStops = FormIn.Cells(Line8D - 5, Col8D + 2).Value2
+            'Form 8D Second and beyond entries
+            NumData = 3
+            If numStops > 0 Then
+                Call Range2DSame(NextRow, 1, Line8D, Col8D, numStops, NumData, Output, FormIn)
+            End If
+            Col8D = Col8D + 3
+        End If
+        'Form 8E
+        If TPO = 2 Or TPO = 3 Then
+            Set FormIn = Workbooks(wname).Worksheets("F08E")
+            numlines = FormIn.Cells(Line8E - 4, Col8E + 4).Value2 'number of spee-time points
+            Output.Cells(NextRow, 1).Value2 = numlines
+            NextRow = NextRow + 1
+            NumData = 5
+            Call Range2DSame(NextRow, 1, Line8E, Col8E, numlines, NumData, Output, FormIn)
+            Col8E = Col8E + 5
+        End If
+        'Form 8F
+        Set FormIn = Workbooks(wname).Worksheets("F08F")
+        NumData = 2
+        Call Vertical2Horizontal(NextRow, 1, Line8F - 3, Col8F, 2, Output, FormIn)
+        numSecs = FormIn.Cells(Line8F - 3, Col8F).Value2
+        NumData = 1
+        Call Range2DSame(NextRow, 1, Line8F, Col8F, numSecs, NumData, Output, FormIn)
+        Col8F = Col8F + 3
+    Loop
+    Exit Sub
 
 ErrorProc:
-  MsgBox "Error in procedure WriteForm8 : " & Err.Description
-  Err.Clear
+    MsgBox "Error in procedure WriteForm8 : " & Err.Description
+    Err.Clear
 End Sub
-
 
 Private Sub WriteForm11()
     Dim RowF11A As Long
@@ -1069,14 +1067,14 @@ Private Sub WriteForm11()
     Set FormIn = Workbooks(wname).Worksheets("F11A")
     Set F11B = Workbooks(wname).Worksheets("F11B")
     col = 2
-    RowF11A = 5 'Starting Row of Form F11a
-    ColF11A = 2 'Starting Column of Form F11a
-    RowF11B = 3 'starting Row of Form FllB
-    ColF11B = 2 'Starting Column of Form F11b
+    RowF11A = 5                                  'Starting Row of Form F11a
+    ColF11A = 2                                  'Starting Column of Form F11a
+    RowF11B = 3                                  'starting Row of Form FllB
+    ColF11B = 2                                  'Starting Column of Form F11b
     NumCol = 6
     Do While FormIn.Cells(RowF11A, ColF11A) <> ""
         Output.Range(Output.Cells(NextRow, 1), Output.Cells(NextRow, NumCol)).Value2 = _
-        FormIn.Range(FormIn.Cells(RowF11A, ColF11A), FormIn.Cells(RowF11A, ColF11A + NumCol - 1)).Value2
+                                                                                     FormIn.Range(FormIn.Cells(RowF11A, ColF11A), FormIn.Cells(RowF11A, ColF11A + NumCol - 1)).Value2
         NextRow = NextRow + 1
         If NumECZ > 1 Then
             Numzones = FormIn.Cells(RowF11A, ColF11A + 1)
@@ -1094,7 +1092,7 @@ Private Sub WriteForm11()
     Loop
             
 End Sub
-            
+
 Sub Range2DSame(routput As Long, coutput As Long, rinput As Long, cinput As Long, rdata As Long, cdata As Long, outputname As Variant, inputname As Variant)
     Range2D(routput, coutput, cdata, rdata, outputname).Value2 = Range2D(rinput, cinput, cdata, rdata, inputname).Value2
     NextRow = NextRow + rdata
@@ -1110,3 +1108,5 @@ Sub Vertical2Horizontal(routput As Long, coutput As Long, rinput As Long, cinput
     Range2D(routput, coutput, VerticalInput, 1, outputname).Value2 = Application.Transpose(Range2D(rinput, cinput, 1, VerticalInput, inputname).Value2)
     NextRow = NextRow + 1
 End Sub
+
+

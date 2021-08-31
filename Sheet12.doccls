@@ -1,20 +1,19 @@
 ﻿Option Explicit
 
-
 Private Sub cmdActivation_Click()
-  Call ActivationFromControl
+    Call ActivationFromControl
 End Sub
 
 Private Sub cmdRead_Click()
-  Call ReadFile
+    Call ReadFile
 End Sub
 
 Private Sub cmdReset_Click()
-  Call Speedon(False) ' Speed on is false
+    Call Speedon(False)                          ' Speed on is false
 End Sub
 
 Private Sub cmdWrite_Click()
-  Call WriteFile
+    Call WriteFile
 End Sub
 
 Private Sub CommandButton2_Click()
