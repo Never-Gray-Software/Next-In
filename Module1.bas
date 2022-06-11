@@ -126,7 +126,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         NumECZ = FormIn.Cells(Row + 2, col).Value2
         InitialReadOption = FormIn.Cells(Row + 7, col).Value2
         If InitialReadOption <> 0 Then
-            InitialFileName = FormIn.Cells(Row + 7, col + 2).Value2
+            InitialFileName = FormIn.Cells(Row + 7, col + 3).Value2
         End If
         NextRow = NextRow + 1
         Row = Row + NumData

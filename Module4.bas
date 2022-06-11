@@ -44,7 +44,7 @@ Public Sub ClearForms(wname As String)
     With Workbooks(wname)
         .Worksheets("F01").Range("D3:D69").ClearContents
         .Worksheets("F01").Range("D3:D22").NumberFormat = "@" 'Force format to be text so dates aren't autmoatically changed
-        .Worksheets("F01").Range("F48").ClearContents 'Erase restart file name
+        .Worksheets("F01").Range("G48").ClearContents 'Erase restart file name
         MaxRowCount = .Worksheets("F02A").UsedRange.Rows.Count
         .Worksheets("F02A").Range("B5:F" & MaxRowCount).ClearContents
         .Worksheets("F02A").Range("B5:F" & MaxRowCount).NumberFormat = "General"
@@ -101,6 +101,7 @@ Public Sub ClearForms(wname As String)
         .Worksheets("F11A").Range("B5:G" & MaxRowCount).ClearContents
         .Worksheets("F11A").Range("B5:G" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F11B").UsedRange.Rows.Count
+        If MaxRowCount < 3 Then MaxRowCount = 3
         .Worksheets("F11B").Range("B3:AO" & MaxRowCount).ClearContents
         .Worksheets("F11B").Range("B3:AO" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F12").UsedRange.Rows.Count
@@ -137,18 +138,33 @@ End Sub
 Private Sub Form1Formulas(wname As String)
     On Error GoTo ErrorProc
     With Workbooks(wname).Worksheets("F01")
-        .Range("D34").Formula = "=COUNT('F03'!B:B)" 'Form 1D
-        .Range("D35").Formula = "=COUNT('F02A'!B:B,'F02B'!B:B)"
+        .Range("D23").Value2 = "17"
+        .Range("D24").Value2 = "7"
+        .Range("D25").Value2 = "2022"
+        .Range("D26").Value2 = "0"
+        .Range("D27").Value2 = "2"
+        .Range("D28").Value2 = "1"
+        .Range("D29:D33").Value2 = "0"
+        .Range("D34").Formula = "=MAX(COUNT('F03'!B:B),1)" 'Form 1D
+        .Range("D35").Formula = "=MAX(COUNT('F02A'!B:B,'F02B'!B:B),1)"
         .Range("D36").Formula = "=COUNT(F02B!B:B)"
-        .Range("D37").Formula = "=COUNT('F06'!B:B)"
+        .Range("D37").Formula = "=MAX(COUNT('F06'!B:B),2)"
         .Range("D39").Formula = "=COUNTA('F04'!B:B)-2"
         .Range("D40").Formula = "=COUNTA('F07'!B:B)-2"
         .Range("D41").Formula = "=COUNTA(F08A!B:B)-2"
         .Range("D42").Formula = "=COUNTA('F09'!3:3)-2"
         .Range("D43").Formula = "=COUNT(F11A!B:B)"
+        .Range("D44").Value2 = "1"
         .Range("D45").Formula = "=COUNT('F10'!B:B)"
         .Range("D46").Formula = "=COUNT(F07C!B:B)"
+        .Range("D47:D48").Value2 = "0"
+        .Range("D57").Value2 = "68."
+        .Range("D58:D63").Value2 = "0"
+        .Range("D64").Value2 = "0.2"
         .Range("D65").Formula = "=COUNT(F07D!B:B)"
+        .Range("D66").Formula = "30"
+        .Range("D67").Formula = "0.5"
+        .Range("D68").Formula = "0"
         .Range("D69").Formula = "=COUNTA(F14AB!B:B)-2"
     End With
     Exit Sub
@@ -160,7 +176,7 @@ End Sub
 Private Sub Form4Formulas(wname As String)       '2p2
     On Error GoTo ErrorProc
     With Workbooks(wname).Worksheets("F04")
-        .Range("J1").Formula = "=NFT"
+        .Range("J1").Formula = "=NUHS"
     End With
     Exit Sub
 ErrorProc:

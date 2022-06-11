@@ -72,6 +72,9 @@ Public Sub ReadFile(Optional unit_test As String)
     WriteForm.TextBox2.Value = "Clearing Forms"
     WriteForm.Repaint
     Call ClearForms(wname)
+    WriteForm.TextBox2.Value = "Writing Formulas" '2p3 Moved up so default files are overwritten
+    WriteForm.Repaint
+    Call Formulas(wname)
     WriteForm.TextBox2.Value = "Reading Form 1"
     WriteForm.Repaint
     Call ReadForm1v2
@@ -120,9 +123,6 @@ Public Sub ReadFile(Optional unit_test As String)
     WriteForm.Repaint
     Call ReadInitializationFile
     WriteForm.Hide
-    WriteForm.TextBox2.Value = "Writing Formulas"
-    WriteForm.Repaint
-    Call Formulas(wname)
     Debug.Print unit_test & " Time to read Input is: " & (Timer - StartTime)
     Call Speedon(False)
     If unit_test = "" Then MsgBox "Finished Reading in File"
@@ -842,7 +842,7 @@ Private Sub ReadInitializationFile()
     On Error GoTo ErrorProc
     If Val(f1e71) = 0 Then Exit Sub
     Set FormIn = Workbooks(wname).Worksheets("F01")
-    FormIn.Cells(48, 6) = Trim(JoinElements(L, 1, 8))
+    FormIn.Cells(48, 7) = Trim(JoinElements(L, 1, 8))
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure ReadInitializationFile: " & Err.Description

@@ -32,7 +32,8 @@ Private Sub ContinueButton2_Click()
     Call Formulas(workbookname)
     Call ip_switch(workbookname, ipversion, "")
     Workbooks(workbookname).Worksheets("Control").ipCheckBox = ipversion
-    Workbooks(workbookname).Worksheets("Control").Range("G19:H19").Value2 = ""
+    Workbooks(workbookname).Worksheets("Control").Range("G19").Value2 = ""
+    Workbooks(workbookname).Worksheets("Control").Range("H19").Value2 = "New File"
     WriteForm.Hide
     Call Speedon(False)
 End Sub
