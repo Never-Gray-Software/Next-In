@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module3"
+Attribute VB_Name = "Read_File"
 'Read and new procedures
 
 Option Explicit
@@ -33,11 +33,13 @@ Dim a As String
 Dim b As String
 Dim d As String
 Dim ipversion As Boolean
+Dim last_line_with_data As String
 
 Public Sub ReadFile(Optional unit_test As String)
     On Error GoTo ErrorProc
     Dim StartTime As Variant
-    Dim cell_value As Variant
+    Dim cell_value, read_date, read_time As Variant
+    Dim read_info As String
     If Not CheckForValidKey Then Exit Sub
     Dim FormIn, Output As Worksheet
     Dim FormRange As Range
@@ -64,6 +66,10 @@ Public Sub ReadFile(Optional unit_test As String)
     Else
         Workbooks(wname).Worksheets("Control").Range("G19").Value2 = "(SES 4.1)"
     End If
+    read_date = Date
+    read_time = Time
+    read_info = "Last Read on " & read_date & " at " & read_time & ":"
+    Workbooks(wname).Worksheets("Control").Range("B19").Value2 = read_info
     Workbooks(wname).Worksheets("Control").Range("H19").Value2 = Infile
     Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     WriteForm.TextBox2.Value = "Reading input into memory"
@@ -100,7 +106,7 @@ Public Sub ReadFile(Optional unit_test As String)
     Call ReadForm7Dv2
     WriteForm.TextBox2.Value = "Reading Form 8"
     WriteForm.Repaint
-    Call ReadForm8v2
+    Call ReadForm8v3
     WriteForm.TextBox2.Value = "Reading Form 9"
     WriteForm.Repaint
     Call ReadForm9v3
@@ -317,14 +323,13 @@ Private Sub ReadForm3v2()                        'reads information from data ar
     With Workbooks(wname).Worksheets("F03")
         Set FormIn = Workbooks(wname).Worksheets("F03")
         r = 5                                    'Starting Row
-        'nsegrange = Worksheets("FORM 2A - section info").Range("e:e") 'sum number of segments
         nsegrange = f1d01
         For f3 = 1 To Int(f1d01)                 'number of segments
             c = 2                                'Starting Coloumn
-            Call AL2E(L, 2, r, c, FormIn)        'Form 3A
+            Call AL2E(L, 2, r, c, FormIn)        'Form 3A - First line, Indentification Number and Line Segment Type
             FormIn.Cells(r, c).Value2 = JoinElements(L - 1, 3, 8) 'Form 3A Identification title
             c = c + 1
-            Call AL2E(L, 5, r, c, FormIn)        'Form 3B
+            Call AL2E(L, 5, r, c, FormIn)        'Form 3A - Second Line
             Call AL2E(L, 8, r, c, FormIn)        'Form 3B Perimeters
             Call AL2E(L, 8, r, c, FormIn)        'Form 3B Roughness
             Call AL2E(L, 7, r, c, FormIn)        'Form 3C Line segment data
@@ -555,7 +560,7 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Private Sub ReadForm8v2()
+Private Sub ReadForm8v3()
     On Error GoTo ErrorProc
     Dim f8 As Long
     Dim r8a As Long
@@ -579,8 +584,6 @@ Private Sub ReadForm8v2()
     Dim iii As Integer
     Dim numpp As Integer
     Dim f8f01 As Integer
-  
-  
     If Val(f1c01) = 0 Then Exit Sub              'skip if trainperformance equal zero
     r = 4
     r8a = 5                                      'initial row number for form 8a
@@ -599,12 +602,18 @@ Private Sub ReadForm8v2()
     For f8 = 1 To Val(f1e01)
         Set FormIn = Workbooks(wname).Worksheets("F08A")
         c = c8a
-        FormIn.Cells(r8a, c).Value2 = JoinElements(L, 1, 7) 'Form 8A Train Route Description
+        FormIn.Cells(r8a, c).Value2 = JoinElements(L, 1, 7) 'Form 8A Train Route Description, Line 1
         c = c + 1
         L = L + 1
+        'Form 8A, Line 2 - Do not overwrite formulas that calculate number of groups of trains and tracks
+        FormIn.Cells(r8a, c).Value2 = Val(DataArray(L, 0)) 'Train Schedule Origin
         f8b = Val(DataArray(L, 1))               ' number of groups of trains that could enter route
         f8c = Val(DataArray(L, 2))               ' number of groups of track sections
-        Call AL2E(L, 7, r8a, c, FormIn)          'Form 8A Part 2 of 2
+        FormIn.Cells(r8a, c + 3).Value2 = Val(DataArray(L, 3)) 'Time Delay
+        FormIn.Cells(r8a, c + 4).Value2 = Val(DataArray(L, 4)) 'First Train Type
+        FormIn.Cells(r8a, c + 5).Value2 = Val(DataArray(L, 5)) 'Minimum Coast Velocity
+        FormIn.Cells(r8a, c + 6).Value2 = Val(DataArray(L, 6)) 'Coast option
+        L = L + 1
         r8a = r8a + 1
         If f8b > 1 Then                          'Form 8B
             Set FormIn = Workbooks(wname).Worksheets("F08B")
@@ -617,23 +626,26 @@ Private Sub ReadForm8v2()
             Call AL2E2D(L, 8, r8c, c8c, f8c, FormIn)
             c8c = c8c + 8                        'keep track of rows for form 8c
             Set FormIn = Workbooks(wname).Worksheets("F08D")
-            nstops = Int(DataArray(L, 0))
-            Call AL2Vertical(L, 2, r8d - 5, c8d + 2, FormIn)
-            'If there is more than one stop read them in
+            nstops = Int(DataArray(L, 0)) 'Formula calculates number of stops, so don't over this information
+            FormIn.Cells(3, c8d + 2).Value2 = (DataArray(L, 1)) 'passenger at origin
+            L = L + 1
+            'Call AL2Vertical(L, 2, r8d - 5, c8d + 2, FormIn)
+            'If there is one or stops read write them to the worksheet
             If nstops > 0 Then Call AL2E2D(L, 3, r8d, c8d, nstops, FormIn)
             c8d = c8d + 3                        'Move over columns for the next route
         End If
         If Val(f1c01) = 2 Or Val(f1c01) = 3 Then 'form 8 E
             Set FormIn = Workbooks(wname).Worksheets("F08E")
             numpp = Val(DataArray(L, 0))
-            FormIn.Cells(2, c8e + 4) = DataArray(L, 0)
             L = L + 1
             Call AL2E2D(L, 5, r8e, c8e, numpp, FormIn)
             c8e = c8e + 5                        'Move over columns for the next route
         End If
         Set FormIn = Workbooks(wname).Worksheets("F08F") 'read in form 8f data
         f8f01 = Int(DataArray(L, 0))             'number of sections
-        Call AL2Vertical(L, 2, r8f - 3, c8f, FormIn) 'Read in two
+        'Call AL2Vertical(L, 2, r8f - 3, c8f, FormIn) 'Read in two
+        FormIn.Cells(3, c8f).Value2 = (DataArray(L, 1)) 'Distance to Portal
+        L = L + 1
         Call FirstArrayLines2Vertical(L, f8f01, r8f, c8f, FormIn)
         c8f = c8f + 3
     Next f8
@@ -728,7 +740,7 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Private Sub ReadForm11v2()
+Private Sub ReadForm11v2() '2p4 Update to not overwrite formulas to count number of line and vent shafts
     On Error GoTo ErrorProc
     Dim R11A As Long
     Dim R11B As Long
@@ -740,9 +752,7 @@ Private Sub ReadForm11v2()
     Dim Numline As Integer
     Dim ii As Integer
     Dim F11A, F11B As Variant
-    Dim test As Boolean
-    test = False
-  
+    Dim stop_loop As Boolean
     Set F11A = Workbooks(wname).Worksheets("F11A")
     Set F11B = Workbooks(wname).Worksheets("F11B")
     R11A = 5
@@ -750,9 +760,14 @@ Private Sub ReadForm11v2()
     C11A = 2
     C11B = 2
     For f11 = 1 To Val(f1e21)
-        If f11 = 39 Then test = True
-        Call AL2E(L, 6, R11A, C11A, F11A)
-        NLS = Int(DataArray(L - 1, 1))           'Number of Line and Vent Segements
+        F11A.Cells(R11A, C11A).Value2 = Val(DataArray(L, 0)) 'Zone Type
+        NLS = Int(DataArray(L, 1))                      'Number of Line and Vent Segements to variable
+        If Val(DataArray(L, 0)) = 1 Then
+            For i = 2 To 5                                  'Skip Column for number of vent zones. Input remaining four values
+                F11A.Cells(R11A, 2 + i).Value2 = Val(DataArray(L, i)) 'Morning Rush Dry-Bulb
+            Next
+        End If
+        L = L + 1
         If Val(f1e21) > 1 Then                   'Environmental Control Zone
             Numline = Int(NLS / 8) + 1
             If (NLS Mod 8 = 0) Then Numline = Numline - 1
@@ -842,7 +857,10 @@ Private Sub ReadInitializationFile()
     On Error GoTo ErrorProc
     If Val(f1e71) = 0 Then Exit Sub
     Set FormIn = Workbooks(wname).Worksheets("F01")
-    FormIn.Cells(48, 7) = Trim(JoinElements(L, 1, 8))
+    FormIn.Cells(48, 7) = last_line_with_data
+    If Len(last_line_with_data) > 255 Then
+        MsgBox "Careful! Restart files longer than 255 characters may not work."
+    End If
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure ReadInitializationFile: " & Err.Description
@@ -857,10 +875,9 @@ Sub TextFileToArray(ByVal FilePath As String)
     Dim TextFile As Integer
     Dim FileContent As String
     Dim LineArray() As String
-    Dim TempArray() As String
     Dim rw As Long, col As Long
-    Dim x, y As Integer
-
+    Dim x, y, last_line_number As Integer
+    Dim last_line As String
     On Error GoTo ErrorProc
   
     'Open the text file in a Read State
@@ -882,15 +899,21 @@ Sub TextFileToArray(ByVal FilePath As String)
     Erase DataArray
     'Debug.Print LBound(LineArray)
     'Debug.Print UBound(LineArray)
-
-
     ReDim Preserve DataArray(UBound(LineArray), 7)
-  
     For x = LBound(LineArray) To UBound(LineArray)
         For y = 0 To 7
             DataArray(x, y) = Mid(LineArray(x), y * 10 + 1, 10)
         Next y
     Next x
+    
+    'Find last line with valid data because might be the restart file name.
+    'Restart file is stored as a string because the array is limited to 80 characters
+    last_line_number = UBound(LineArray)
+    last_line_with_data = LineArray(last_line_number)
+    Do While (Len(last_line_with_data) = 0)
+        last_line_number = last_line_number - 1
+        last_line_with_data = LineArray(last_line_number)
+    Loop
     Exit Sub
 
 ErrorProc:
@@ -942,12 +965,18 @@ ErrorProc:
     Err.Clear
 End Sub
 
-'Array Line to Excel Line
+'Array Line to Excel Line (AL2E)
+'Copy the line of the an array to an excel
+'Input:
+        'arrayline is the line number in the arrary where the data is located
+        'ndata is the number of data points to take from the arrayline
+        'Erow and Ecol are the row and column number on the excel sheet for the output
+        'sname is excel worksheet for output
 Sub AL2E(arrayline As Integer, ndata As Integer, ERow As Long, ECol As Long, sname As Variant)
     On Error GoTo ErrorProc
     OutRange(ERow, ECol, ndata, sname).Value2 = DataFromArray(arrayline, ndata)
-    L = L + 1
-    c = c + ndata
+    L = L + 1       'Advance the line number to read the next line of the array
+    c = c + ndata   'Advance the number of columns for next input in Excel
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure AL2E: " & Err.Description

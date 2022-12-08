@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module5"
+Attribute VB_Name = "local_lock_subroutines"
 Option Compare Binary
 Public Const MIN_ASC As Integer = 32
 Public Const MAX_ASC As Integer = 126

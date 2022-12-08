@@ -161,7 +161,7 @@ Public Function CheckForValidKey()
         End Select
         Exit Function
     Else
-        If Module5.Local_Lock Then
+        If local_lock_subroutines.Local_Lock Then
             CheckForValidKey = True
             Sheet12.cmdRead.Enabled = True
             Sheet12.cmdReset.Enabled = True

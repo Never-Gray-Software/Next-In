@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module4"
+Attribute VB_Name = "Clear_and_Add_Formulas"
 Option Explicit
 
 Public Sub Formulas(wname As String)
@@ -221,10 +221,10 @@ Private Sub Form8AFormulas(wname As String)      '(wname As String)
         cF08c = 2                                'Column for F08c
         For i = 0 To 19 Step 1
             'Create formula for Number of Group Train Enter
-            numGroup = "=if(R[0]C[-2]<>"""",COUNT(F08B!C" & cF08b + i * 3 & " )+1,"""")"
+            numGroup = "=if(R[0]C[-2]<>"""",COUNT(F08B!C" & cF08b + i * 3 & ")+1,"""")"
             .Range("D" & rF08a + i).FormulaR1C1 = numGroup
             'Create formula for Number of Track Sections in Route
-            numSect = "=if(R[0]C[-3]<>"""",COUNT(F08C!C" & cF08c + i * 8 & " ),"""")"
+            numSect = "=if(R[0]C[-3]<>"""",COUNT(F08C!C" & cF08c + i * 8 & "),"""")"
             .Range("E" & rF08a + i).FormulaR1C1 = numSect
         Next
     End With
@@ -336,10 +336,20 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Private Sub Form11AFormulas(wname As String)
+Private Sub Form11AFormulas(wname As String)    '2p4 Update for formulas
     On Error GoTo ErrorProc
+    Dim i, starting_row, first_column_to_count, next_column_increment As Integer
+    Dim formula_text As String
     With Workbooks(wname).Worksheets("F11a")
         .Range("G1").Formula = "=ecleo"          'Reference to Form 1 C, Environmental Control Load Evaluation Option
+        starting_row = 5                         'Row where fomulas start to be written
+        first_column_to_count = 2                'First column to count
+        next_column_increment = 1                'The increment to the next column to count
+        For i = 0 To 39 Step 1
+            'Create formula for Number of Group Train Enter
+            formula_text = "=if(R[0]C[-1]<>"""",COUNT(F11B!C" & (first_column_to_count + (i * next_column_increment)) & "),"""")"
+            .Range("C" & starting_row + i).FormulaR1C1 = formula_text
+        Next
     End With
     Exit Sub
 ErrorProc:

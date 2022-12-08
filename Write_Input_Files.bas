@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module1"
+Attribute VB_Name = "Write_Input_Files"
 Option Explicit
 
 Public wname As String
@@ -572,7 +572,8 @@ End Sub
 
 Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
-    Dim SaveName As String
+    Dim SaveName, write_info As String
+    Dim write_date, write_time As Variant
     If unit_name = "" Then
         SaveName = Application.GetSaveAsFilename(fileFilter:="SES V6 Input File (*.inp), *.inp", Title:="Save SES Input File")
     Else
@@ -589,8 +590,18 @@ Private Sub WriteINP(Optional unit_name As String)
         Else
             Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
         End If
+        'Add information about the file that was written to the control sheet
+        write_date = Date
+        write_time = Time
+        write_info = "Last Wrote on " & write_date & " at " & write_time & ":"
+        Workbooks(wname).Worksheets("Control").Range("B20").Value2 = write_info
         Workbooks(wname).Worksheets("Control").Range("H20").Value2 = SaveName 'Change sheet to say last saved
         Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+        If Not ipversion Then
+            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
+        Else
+            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
+        End If
         If Workbooks(wname).Worksheets("Control").CheckBox1.Value = True Then
             If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then
                 CallSES (SaveName)
