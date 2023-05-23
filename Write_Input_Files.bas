@@ -620,7 +620,7 @@ Private Sub CallSES(path As String)
     On Error GoTo ErrorProc
     WriteForm.TextBox2.Value = "Attempting to run SES v6"
     WriteForm.Repaint
-    Call Shell("SVSV6_32.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
+    Call Shell("SESV6_32.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure CallSES: " & Err.Description
