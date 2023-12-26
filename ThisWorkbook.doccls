@@ -1,6 +1,1 @@
-﻿Option Explicit
-
-'Private Sub Workbook_Open()
-'    Call ModValidKey.CheckActivation             ' checking for valid key
-'    If Not CheckForValidKey Then Exit Sub
-'End Sub
+﻿
