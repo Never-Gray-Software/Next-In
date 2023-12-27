@@ -1,12 +1,19 @@
-Next-In Description
+# Next-In Description
 
-This spreadsheet lets users create and modify SES input files. After activation (see Getting Started), you can rename and save this spreadsheet anywhere on the same computer. You cannot rename the worksheets or add rows or add columns. You can add more worksheets and edits cells.
+This spreadsheet can create, read, and write SES input files. The spreadsheet can also initiate SES simulations. The user cannot rename, add rows, or add columns to existing worksheets. Cells and formulas can be edited. You can add worksheets. The Excel Workbook, with Macro, is available at www.nevergray.biz/next-in. This site shares the source code contained in the Macros.
 
-Macros are extracted using Rubberduck. 
+# Macros
+The main VBA macro code are in the *.bas files listed below. Macros can be imported and exported using [Rubberduck](https://rubberduckvba.com/). 
 
+- Clear_and_Add_Formulas.bas
+- Read_File.bas
+- unit_tests.bas
+- Write_Input_Files.bas
+
+# Licensing
 https://opensource.org/license/BSD-3-clause/
 
-Copyright 2024 Never Gray, Justin Edenbaum P.Eng.
+Copyright 2024 [Never Gray](https://www.nevergray.biz/next-in), Justin Edenbaum P.Eng.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
