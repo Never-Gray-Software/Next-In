@@ -60,9 +60,9 @@ Public Sub ReadFile(Optional unit_test As String)
     Else                                         ' unit test is being conducted so infile is equal to another string
         Infile = unit_test
     End If
-    ipversion = Workbooks(wname).Worksheets("Control").ipCheckBox.Value
     Call Speedon(True)
     StartTime = Timer
+    ipversion = is_version_ip(wname)
     cell_value = Workbooks(wname).Worksheets("Control").Range("G19").Value2 'Value of last read in
     WriteForm.Show vbModeless
     WriteForm.TextBox2.Value = "Adjusting Version"
@@ -160,8 +160,9 @@ Public Sub choosefile(Infile)
     With FD
         'Use the Show method to display the File Picker dialog box and return the user's action.
         'The user pressed the action button.
-        'If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
         .AllowMultiSelect = False
+        .Filters.Clear
         .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
         If .Show = -1 Then
             For Each vrtSelectedItem In .SelectedItems
@@ -178,9 +179,17 @@ Public Sub choosefile(Infile)
     Set FD = Nothing
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure ChooseFile : " & Err.Description
+    MsgBox "Error in procedure choosefile : " & Err.Description
     Err.Clear
 End Sub
+
+Function is_version_ip(wname)
+    If Workbooks(wname).Worksheets("Control").Range("B2") = 2 Then
+        is_version_ip = True
+    Else
+        is_version_ip = False
+    End If
+End Function
 
 Private Sub ReadForm1v2()
     On Error GoTo ErrorProc

@@ -1,9 +1,5 @@
 ﻿Option Explicit
 
-Private Sub cmdActivation_Click()
-    Call ActivationFromControl
-End Sub
-
 Private Sub cmdRead_Click()
     Call ReadFile
 End Sub
@@ -16,11 +12,15 @@ Private Sub cmdWrite_Click()
     Call WriteFile
 End Sub
 
-Private Sub CommandButton2_Click()
-    NewInput.SES4p1_Check1.Value = ipCheckBox.Value
+Private Sub New_Botton_Click()
+    Dim wname As String
+    wname = ActiveWorkbook.Name
+    NewInput.SES4p1_Check1.Value = is_version_ip(wname)
     NewInput.Show
 End Sub
 
-Private Sub OptionButton4_Click()
-    Local_Lock
+Private Sub Select_Exe_Click()
+    Dim wname As String
+    wname = ActiveWorkbook.Name
+    Call choose_ses_exe(wname)
 End Sub

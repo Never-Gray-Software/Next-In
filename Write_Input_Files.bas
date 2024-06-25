@@ -66,7 +66,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     LC = 2                                       'Most left cell with data
     Calculate                                    'make sure to recalculate any formulas
     wname = ActiveWorkbook.Name
-    ipversion = Workbooks(wname).Worksheets("Control").ipCheckBox.Value
+    ipversion = is_version_ip(wname)
     Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
         Set Output = Workbooks(wname).Worksheets("Output")
@@ -611,11 +611,7 @@ Private Sub WriteINP(Optional unit_name As String)
             Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
         End If
         If Workbooks(wname).Worksheets("Control").CheckBox1.Value = True Then
-            If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then
-                CallSES (SaveName)
-            Else
-                CallSES41 (SaveName)
-            End If
+            Call_SES_Exe (SaveName)
         End If
     End If
     Exit Sub
@@ -624,25 +620,58 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Private Sub CallSES(path As String)
+Private Sub Call_SES_Exe(path As String)
+    Dim path_exe, shell_command As String
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.Value = "Attempting to run SES v6"
+    WriteForm.TextBox2.Value = "Attempting to run SES"
     WriteForm.Repaint
-    Call Shell("SESV6_32.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
+    path_exe = Workbooks(wname).Worksheets("Control").Range("I10").Value2
+    If path_exe <> "" Then
+        shell_command = """" & path_exe & """ """ & path & """"
+        Call Shell(shell_command, vbNormalNoFocus) 'Previously vbNormalFocus
+    End If
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure CallSES: " & Err.Description
+    MsgBox "Error in procedure CallSESv2: " & Err.Description
     Err.Clear
 End Sub
 
-Private Sub CallSES41(path As String)
+Public Sub choose_ses_exe(wname)
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.Value = "Attempting to run SES 4.1 on IP File"
-    WriteForm.Repaint
-    Call Shell("SES41.exe """ & path & """ ", vbNormalNoFocus) 'Previously vbNormalFocus
+    'Declare a variable as a FileDialog object.
+    Dim FD As FileDialog
+    'Create a FileDialog object as a File Picker dialog box.
+    Set FD = Application.FileDialog(msoFileDialogFilePicker)
+    'Declare a variable to contain the path
+    'of each selected item. Even though the path is a String,
+    'the variable must be a Variant because For Each...Next
+    'routines only work with Variants and Objects.
+    Dim vrtSelectedItem As Variant
+    'Use a With...End With block to reference the FileDialog object.
+    With FD
+        'Use the Show method to display the File Picker dialog box and return the user's action.
+        'The user pressed the action button.
+        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+        .AllowMultiSelect = False
+        .Filters.Clear
+        .Filters.Add "Executable Files", "*.EXE", 1
+        If .Show = -1 Then
+            For Each vrtSelectedItem In .SelectedItems
+                'vrtSelectedItem is a String that contains the path of each selected item.
+                'You can use any file I/O functions that you want to work with this path.
+                'This example simply displays the path in a message box.
+                'MsgBox "The path is: " & vrtSelectedItem
+                Infile = vrtSelectedItem
+            Next vrtSelectedItem
+        Else: Infile = ""
+        End If
+    End With
+    Workbooks(wname).Worksheets("Control").Range("I10").Value2 = Infile
+    'Set the object variable to Nothing.
+    Set FD = Nothing
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure CallSES: " & Err.Description
+    MsgBox "Error in procedure choose_ses_exe : " & Err.Description
     Err.Clear
 End Sub
 
