@@ -12,7 +12,7 @@ Option Explicit
 
 Public Sub Formulas(wname As String)
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.Value = "Creating Formulas"
+    WriteForm.TextBox2.value = "Creating Formulas"
     WriteForm.Repaint
     Call Form1Formulas(wname)
     Call Form4Formulas(wname)                    '2p2
@@ -38,7 +38,7 @@ End Sub
 
 Public Sub ClearForms(wname As String)
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.Value = "Clearing Data"
+    WriteForm.TextBox2.value = "Clearing Data"
     WriteForm.Repaint
     Dim ws As Worksheet
     Dim MaxRowCount As Long                      ' Do not use Integer, may be too small and cause overflow
@@ -55,55 +55,72 @@ Public Sub ClearForms(wname As String)
         .Worksheets("F01").Range("D3:D22").NumberFormat = "@" 'Force format to be text so dates aren't autmoatically changed
         .Worksheets("F01").Range("G48").ClearContents 'Erase restart file name
         MaxRowCount = .Worksheets("F02A").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F02A").Range("B5:F" & MaxRowCount).ClearContents
         .Worksheets("F02A").Range("B5:F" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F02B").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F02B").Range("B5:E" & MaxRowCount).ClearContents
         .Worksheets("F02B").Range("B5:E" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F03").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F03").Range("B5:AX" & MaxRowCount).ClearContents
         .Worksheets("F03").Range("B5:AX" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F04").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F04").Range("B5:J" & MaxRowCount).ClearContents
         .Worksheets("F04").Range("B5:J" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F05").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F05").Range("B5:AA" & MaxRowCount).ClearContents
         .Worksheets("F05").Range("B5:AA" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F06").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F06").Range("B5:AY" & MaxRowCount).ClearContents
         .Worksheets("F06").Range("B5:AY" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F07").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F07").Range("B5:V" & MaxRowCount).ClearContents
         .Worksheets("F07").Range("B5:V" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F07C").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F07C").Range("B5:H" & MaxRowCount).ClearContents
         .Worksheets("F07C").Range("B5:H" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F07D").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F07D").Range("B5:I" & MaxRowCount).ClearContents
         .Worksheets("F07D").Range("B5:I" & MaxRowCount).NumberFormat = "General"
         'Headers of Form 8 are cleared with loop listed at end of procedure
         MaxRowCount = .Worksheets("F08A").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F08A").Range("B5:I" & MaxRowCount).ClearContents
         .Worksheets("F08A").Range("B5:I" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F08B").UsedRange.Rows.Count
+        If MaxRowCount < 4 Then MaxRowCount = 4
         .Worksheets("F08B").Range("B4:BI" & MaxRowCount).ClearContents
         .Worksheets("F08B").Range("B4:BI" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F08C").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F08C").Range("B5:FE" & MaxRowCount).ClearContents
         .Worksheets("F08C").Range("B5:FE" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F08D").UsedRange.Rows.Count
+        If MaxRowCount < 7 Then MaxRowCount = 7
         .Worksheets("F08D").Range("B7:BI" & MaxRowCount).ClearContents
         .Worksheets("F08D").Range("B7:BI" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F08E").UsedRange.Rows.Count
+        If MaxRowCount < 6 Then MaxRowCount = 6
         .Worksheets("F08E").Range("B6:CW" & MaxRowCount).ClearContents
         .Worksheets("F08E").Range("B6:CW" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F08F").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F08F").Range("D5:BI" & MaxRowCount).ClearContents
         .Worksheets("F08F").Range("D5:BI" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F09").UsedRange.Rows.Count
+        If MaxRowCount < 3 Then MaxRowCount = 3
         .Worksheets("F09").Range("F3:Y" & MaxRowCount).ClearContents
         .Worksheets("F09").Range("F3:Y" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F10").UsedRange.Rows.Count
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F10").Range("B5:I" & MaxRowCount).ClearContents
         .Worksheets("F10").Range("B5:I" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F11A").UsedRange.Rows.Count
@@ -115,15 +132,19 @@ Public Sub ClearForms(wname As String)
         .Worksheets("F11B").Range("B3:AO" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F12").UsedRange.Rows.Count
         .Worksheets("F12").Range("D2:D3").ClearContents 'Clear Temp Tab
+        If MaxRowCount < 5 Then MaxRowCount = 5
         .Worksheets("F12").Range("B5:H" & MaxRowCount).ClearContents
         .Worksheets("F12").Range("B5:H" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F13").UsedRange.Rows.Count
+        If MaxRowCount < 4 Then MaxRowCount = 4 'Needed if cells are already empty
         .Worksheets("F13").Range("B4:E" & MaxRowCount).ClearContents
         .Worksheets("F13").Range("B4:E" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F14AB").UsedRange.Rows.Count
+        If MaxRowCount < 4 Then MaxRowCount = 4
         .Worksheets("F14AB").Range("B4:L" & MaxRowCount).ClearContents
         .Worksheets("F14AB").Range("B4:L" & MaxRowCount).NumberFormat = "General"
         MaxRowCount = .Worksheets("F14C").UsedRange.Rows.Count
+        If MaxRowCount < 4 Then MaxRowCount = 4
         .Worksheets("F14C").Range("B4:K" & MaxRowCount).ClearContents
         .Worksheets("F14C").Range("B4:K" & MaxRowCount).NumberFormat = "General"
         For i = 1 To 20                          'Clear header rows on Form 8

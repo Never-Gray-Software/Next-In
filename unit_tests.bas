@@ -7,6 +7,9 @@ Attribute VB_Name = "unit_tests"
 'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'Unit test to make sure software works correctly
+'Create a folder with input files (IP or SI, not both).
+'The unit test reads in all files and writes them out with a suffix of *.nxi.
+'You can then compare the original file with the one created with Next-In
 
 Dim blNotFirstIteration As Boolean
 Dim Fil As File
@@ -22,6 +25,7 @@ Sub unit_test()
     If strFolder <> "" Then
         Call FindFilesInFolders(strFolder, "inp")
     End If
+    MsgBox "Finished Unit Test", vbInformation, "Information"
 End Sub
 
 ' From https://wellsr.com/vba/2018/excel/list-files-in-folder-and-subfolders-with-vba-filesystemobject/

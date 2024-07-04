@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput 
    Caption         =   "Create New Input"
-   ClientHeight    =   4530
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   4605
+   ClientHeight    =   3612
+   ClientLeft      =   132
+   ClientTop       =   492
+   ClientWidth     =   4608
    OleObjectBlob   =   "NewInput.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -19,8 +19,13 @@ Private Sub CancelButton1_Click()
 End Sub
 
 Private Sub ContinueButton1_Click()
-    NewInput2.SES4p1_Check2.Value = NewInput.SES4p1_Check1.Value
+    NewInput2.SES4p1_Check2.value = NewInput.SES4p1_Check1.value
     NewInput.Hide
     NewInput2.Show
 End Sub
 
+Private Sub UserForm_Initialize()
+    ' Set the desired position (e.g., top-left corner of the primary monitor)
+    Me.Left = 100 ' X position
+    Me.Top = 100 ' Y position
+End Sub

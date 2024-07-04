@@ -15,7 +15,7 @@ End Sub
 Private Sub New_Botton_Click()
     Dim wname As String
     wname = ActiveWorkbook.Name
-    NewInput.SES4p1_Check1.Value = is_version_ip(wname)
+    NewInput.SES4p1_Check1.value = is_version_ip(wname)
     NewInput.Show
 End Sub
 

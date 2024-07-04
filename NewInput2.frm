@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput2 
    Caption         =   "Create New Input"
-   ClientHeight    =   4530
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   4605
+   ClientHeight    =   4515
+   ClientLeft      =   60
+   ClientTop       =   216
+   ClientWidth     =   5736
    OleObjectBlob   =   "NewInput2.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -24,7 +24,7 @@ Private Sub ContinueButton2_Click()
     Dim workbookname As String
     Dim ipversion As Boolean
     Dim wname_local As String
-    ipversion = NewInput2.SES4p1_Check2.Value
+    ipversion = NewInput2.SES4p1_Check2.value
     NewInput2.Hide
     workbookname = ActiveWorkbook.Name
     WriteForm.Show vbModeless
@@ -42,4 +42,10 @@ Private Sub ContinueButton2_Click()
     End If
     WriteForm.Hide
     Call Speedon(False)
+End Sub
+
+Private Sub UserForm_Initialize()
+    ' Set the desired position (e.g., top-left corner of the primary monitor)
+    Me.Left = 100 ' X position
+    Me.Top = 100 ' Y position
 End Sub

@@ -56,7 +56,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     Dim StartTime, Ftime, EndTime As Double
     StartTime = Timer
     WriteForm.Show vbModeless
-    WriteForm.TextBox2.Value = "Formulas are Calculating"
+    WriteForm.TextBox2.value = "Formulas are Calculating"
     WriteForm.Repaint
     'Start program
     Call Speedon(True)                           'Makes the program work faster.
@@ -70,7 +70,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
         Set Output = Workbooks(wname).Worksheets("Output")
-        WriteForm.TextBox2.Value = "Producing Form 1"
+        WriteForm.TextBox2.value = "Producing Form 1"
         WriteForm.Repaint
         If .Worksheets("F01").Range("D3") = "" Then
             WriteForm.Hide
@@ -160,7 +160,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             Row = Row + NumData
         End If
         ' Form 2A
-        WriteForm.TextBox2.Value = "Writing Form 2A"
+        WriteForm.TextBox2.value = "Writing Form 2A"
         WriteForm.Repaint
         num_sections = .Worksheets("F01").Range("D35").Value2
         num_vents = .Worksheets("F01").Range("D36").Value2
@@ -177,7 +177,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         NextRow = NextRow + num_line_sec
         ' Form 2B
         If num_vents > 0 Then
-            WriteForm.TextBox2.Value = "Writing Form 2B"
+            WriteForm.TextBox2.value = "Writing Form 2B"
             WriteForm.Repaint
             Set FormIn = .Worksheets("F02B")
             RC = 5                               'Number of columns of data
@@ -190,7 +190,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             NextRow = NextRow + num_vents
         End If
         ' Form 3
-        WriteForm.TextBox2.Value = "Producing Form 3"
+        WriteForm.TextBox2.value = "Producing Form 3"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F03")
         'Set FormRange = FormIn.Range("A1:AX1500")
@@ -279,7 +279,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             Row = Row + R_off
         Loop
         ' Form 4
-        WriteForm.TextBox2.Value = "Producing Form 4"
+        WriteForm.TextBox2.value = "Producing Form 4"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F04")
         'Set FormRange = FormIn.Range("A1:AX1500")
@@ -308,7 +308,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             Loop
         End If
         ' Form 5
-        WriteForm.TextBox2.Value = "Producing Form 5"
+        WriteForm.TextBox2.value = "Producing Form 5"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F05")
         Row = 5                                  'Starting Row
@@ -362,7 +362,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             If counter = 1 Then Row = Row + 1
         Loop
         'Form 6
-        WriteForm.TextBox2.Value = "Producing Form 6"
+        WriteForm.TextBox2.value = "Producing Form 6"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F06")
         col = 2
@@ -422,7 +422,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             Row = Row + 1
         Loop                                     'Loop for Nodes on Form 6
         'Form 7A and B
-        WriteForm.TextBox2.Value = "Producing Form 7A and 7B"
+        WriteForm.TextBox2.value = "Producing Form 7A and 7B"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F07")
         col = 2
@@ -454,7 +454,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             col = 2                              'Reset Column
         Loop
         'Form 7C
-        WriteForm.TextBox2.Value = "Producing Form 7C"
+        WriteForm.TextBox2.value = "Producing Form 7C"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F07C")
         col = 2
@@ -469,7 +469,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             col = 2                              'Reset Column
         Loop
         'Form 7D needs to be inputted here
-        WriteForm.TextBox2.Value = "Producing Form 7D"
+        WriteForm.TextBox2.value = "Producing Form 7D"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F07D")
         col = 2
@@ -484,18 +484,18 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         Loop
         'Form 8
         If TPO > 0 Then
-            WriteForm.TextBox2.Value = "Producing Form 8"
+            WriteForm.TextBox2.value = "Producing Form 8"
             WriteForm.Repaint
             Call WriteForm8
         End If                                   'If statement to skip Form 9 if train performance option is 0
         'Form 9
         If TPO > 0 Then
-            WriteForm.TextBox2.Value = "Producing Form 9"
+            WriteForm.TextBox2.value = "Producing Form 9"
             WriteForm.Repaint
             Call WriteForm9(NextRow)
         End If                                   'If statement to skip Form 9 if train performance option is 0
         'Form 10
-        WriteForm.TextBox2.Value = "Producing Form 10"
+        WriteForm.TextBox2.value = "Producing Form 10"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F10")
         col = 2
@@ -508,12 +508,12 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
             Row = Row + 1
         Loop
         'Form 11
-        WriteForm.TextBox2.Value = "Producing Form 11"
+        WriteForm.TextBox2.value = "Producing Form 11"
         WriteForm.Repaint
         Call WriteForm11
         'Form 12
         Set FormIn = .Worksheets("F12")
-        WriteForm.TextBox2.Value = "Producing Form 12"
+        WriteForm.TextBox2.value = "Producing Form 12"
         WriteForm.Repaint
         NumData = 2
         Row = 2
@@ -534,7 +534,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         End With
         NextRow = NextRow + NumPrint
         'Form 13
-        WriteForm.TextBox2.Value = "Producing Form 13"
+        WriteForm.TextBox2.value = "Producing Form 13"
         WriteForm.Repaint
         Set FormIn = .Worksheets("F13")
         col = 2
@@ -548,7 +548,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         Loop
         'Form 14
         If CPipe > 0 Then
-            WriteForm.TextBox2.Value = "Producing Form 14"
+            WriteForm.TextBox2.value = "Producing Form 14"
             WriteForm.Repaint
             Call WriteForm14
         End If
@@ -558,12 +558,12 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
         End If
     End With
     Call FormatINP                               'Adjust width and alignment of text
-    WriteForm.TextBox2.Value = "Formatting Numbers"
+    WriteForm.TextBox2.value = "Formatting Numbers"
     WriteForm.Repaint
     Call FormatNumbersArray                      'Adjust numerical format
     EndTime = Timer
     Debug.Print unit_name & " Time after formating before save: " & (EndTime - StartTime)
-    WriteForm.TextBox2.Value = "Exporting File"
+    WriteForm.TextBox2.value = "Exporting File"
     Call Speedon(False)                          'Enable items that previously slowed down processing.
     If unit_name = "" Then
         Call WriteINP                            'Write out file to text file
@@ -582,8 +582,9 @@ Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
     Dim SaveName, write_info As String
     Dim write_date, write_time As Variant
+    SaveName = ""
     If unit_name = "" Then
-        SaveName = Application.GetSaveAsFilename(fileFilter:="SES V6 Input File (*.inp), *.inp", Title:="Save SES Input File")
+        SaveName = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
     Else
         SaveName = unit_name
     End If
@@ -593,11 +594,6 @@ Private Sub WriteINP(Optional unit_name As String)
         ActiveWorkbook.SaveAs FileName:=SaveName, FileFormat:=xlTextPrinter, CreateBackup:=False
         ActiveWorkbook.Close
         Application.DisplayAlerts = True
-        If Not Workbooks(wname).Worksheets("Control").ipCheckBox.Value Then 'Change sheet to last version written
-            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
-        Else
-            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
-        End If
         'Add information about the file that was written to the control sheet
         write_date = Date
         write_time = Time
@@ -605,25 +601,25 @@ Private Sub WriteINP(Optional unit_name As String)
         Workbooks(wname).Worksheets("Control").Range("B20").Value2 = write_info
         Workbooks(wname).Worksheets("Control").Range("H20").Value2 = SaveName 'Change sheet to say last saved
         Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
-        If Not ipversion Then
-            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
-        Else
+        If ipversion Then
             Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
+        Else
+            Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
         End If
-        If Workbooks(wname).Worksheets("Control").CheckBox1.Value = True Then
+        If Workbooks(wname).Worksheets("Control").CheckBox1.value = True Then
             Call_SES_Exe (SaveName)
         End If
     End If
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure WriteIMP: " & Err.Description
+    MsgBox "Error in procedure WriteINP: " & Err.Description
     Err.Clear
 End Sub
 
 Private Sub Call_SES_Exe(path As String)
     Dim path_exe, shell_command As String
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.Value = "Attempting to run SES"
+    WriteForm.TextBox2.value = "Attempting to run SES"
     WriteForm.Repaint
     path_exe = Workbooks(wname).Worksheets("Control").Range("I10").Value2
     If path_exe <> "" Then
@@ -632,7 +628,7 @@ Private Sub Call_SES_Exe(path As String)
     End If
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure CallSESv2: " & Err.Description
+    MsgBox "Error in procedure Call_SES_Exe: " & Err.Description
     Err.Clear
 End Sub
 
@@ -734,8 +730,10 @@ ErrorProc:
 End Sub
 
 Public Sub Speedon(ByVal SetOn As Boolean)
-    'Turns on the time wasters
+    'Speeds up processing by turning off some functionality
+    'Sets the application to use Decimal Seperartor as a period.
     On Error GoTo ErrorProc
+    Dim temp As Integer
     With Application
         If SetOn Then
             .Calculation = xlCalculationManual
@@ -767,7 +765,7 @@ Private Sub WriteForm9(OutRow)
     Set FormIn = Workbooks(wname).Worksheets("F09")
     Do While FormIn.Cells(Row, col) <> ""
         'Test code
-        WriteForm.TextBox2.Value = "Producing Form 9"
+        WriteForm.TextBox2.value = "Producing Form 9"
         WriteForm.Repaint
         'Form 9A Line 1, Write Source Name
         Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, 1)).Value2 = _
@@ -852,7 +850,7 @@ Private Sub WriteForm9(OutRow)
             Output.Range(Output.Cells(OutRow, 1), Output.Cells(OutRow, NumData)).Value2 = _
                                                                                         Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData, col)).Value2)
             OutRow = OutRow + 1
-            TCO = Int(FormIn.Cells(Row, col).Value2) 'Train Control Option
+            TCO = Int_International(FormIn.Cells(Row, col).Value2) 'Train Control Option
             If TCO = 2 Then
                 'Form 9H Line 1 Train Controller
                 Row = Row + NumData
@@ -992,7 +990,7 @@ Private Sub WriteForm14()
             Next i
             Erase NumArray
         ElseIf numSec = 1 Then
-            SNum = Int(F14C.Cells(RowF14C, ColF14C).Value2)
+            SNum = Int_International(F14C.Cells(RowF14C, ColF14C).Value2)
             If SNum > 0 Then
                 Output.Cells(NextRow, 1).Value2 = "'+" & SNum & "."
             Else
@@ -1126,7 +1124,7 @@ Private Sub WriteForm11()
         NextRow = NextRow + 1
         If NumECZ > 1 Then
             Numzones = FormIn.Cells(RowF11A, ColF11A + 1)
-            numlines = Int(Numzones / 8) + 1
+            numlines = Int_International(Numzones / 8) + 1
             If (Numzones Mod 8 = 0) Then numlines = numlines - 1
             'NumCol = 8
             Row = RowF11B
