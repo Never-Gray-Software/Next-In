@@ -522,6 +522,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
                                                                                       Application.Transpose(FormIn.Range(FormIn.Cells(Row, col), FormIn.Cells(Row + NumData - 1, col)).Value2)
         'Form 12 Second and beyond entries
         NumPrint = FormIn.Cells(3, 4).Value2
+        If NumPrint = 0 Then NumPrint = 1 'This forces blank values if Form 12 is empty.
         NextRow = NextRow + 1
         col = 2
         Row = 5
