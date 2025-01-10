@@ -50,8 +50,25 @@ Dim ipversion As Boolean
 
 Dim segtype As Integer
 
+'Locations of information on the control sheet
+Public Write_Options As Range
+Public SES_Exe As Range
+Public NextOut_Exe As Range
+Public Visio_File As Range
+
+
+Sub Get_Control_Values(wname)
+    Set SES_Exe = Workbooks(wname).Worksheets("Control").Range("H14")
+    Set NextOut_Exe = Workbooks(wname).Worksheets("Control").Range("H15")
+    Set Write_Options = Workbooks(wname).Worksheets("Control").Range("C13")
+    Set Visio_File = Workbooks(wname).Worksheets("Control").Range("H17")
+End Sub
+
 Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
+    'unit_name is used for unit_tests. Otherwise, the value should be empty
     On Error GoTo ErrorProc
+    wname = ActiveWorkbook.Name
+    Get_Control_Values (wname) 'Get settings from Control worksheet
     Dim num_sections, num_vents, num_line_sec As Integer 'Variables for Form 2
     Dim StartTime, Ftime, EndTime As Double
     StartTime = Timer
@@ -65,7 +82,6 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     TC = 5                                       'Top Cell with Data on most sheets
     LC = 2                                       'Most left cell with data
     Calculate                                    'make sure to recalculate any formulas
-    wname = ActiveWorkbook.Name
     ipversion = is_version_ip(wname)
     Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
@@ -579,57 +595,76 @@ ErrorProc:
     Err.Clear
 End Sub
 
+Sub InitializeRanges()
+    Set ControlSheetRange = ThisWorkbook.Worksheets("Control").Range("I10")
+    Set AnotherRange = ThisWorkbook.Worksheets("Control").Range("J20")
+End Sub
+
 Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
-    Dim SaveName, write_info As String
+    Dim savename, write_info As String
     Dim write_date, write_time As Variant
-    SaveName = ""
+    Dim open_save_as_dialog, save_file As Boolean
+    Dim overwrite_exiting_file As VbMsgBoxResult
+    savename = ""
     If unit_name = "" Then
-        SaveName = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
+        open_save_as_dialog = True 'Open the save as dialog box
     Else
-        SaveName = unit_name
+        savename = unit_name
+        open_save_as_dialog = False 'skip the save as dialog box
+        save_file = True 'save the file!
     End If
-    If (Trim(SaveName) <> "" And SaveName <> "False") Then
-        Application.DisplayAlerts = True
+    While open_save_as_dialog
+        savename = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
+        If Dir(savename) <> "" Then 'Test if file already exists
+            overwrite_exiting_file = MsgBox("The file already exists. Do you want to overwrite it?", vbYesNoCancel + vbExclamation, "File Exists")
+                Select Case overwrite_exiting_file
+                    Case vbYes ' Overwrite the file
+                        save_file = True
+                        open_save_as_dialog = False
+                    Case vbNo ' Ask user for a new file name
+                        save_file = False
+                        open_save_as_dialog = True
+                    Case vbCancel
+                        save_file = False
+                        open_save_as_dialog = False
+                End Select
+        Else
+            open_save_as_dialog = False
+            save_file = True
+        End If
+    Wend
+    If save_file Then
+        Application.DisplayAlerts = False 'False to suppress alert message
         ThisWorkbook.Sheets("Output").Copy
-        ActiveWorkbook.SaveAs FileName:=SaveName, FileFormat:=xlTextPrinter, CreateBackup:=False
+        ActiveWorkbook.SaveAs FileName:=savename, FileFormat:=xlTextPrinter, CreateBackup:=False
         ActiveWorkbook.Close
-        Application.DisplayAlerts = True
+        Application.DisplayAlerts = True 'Renable alert messages
         'Add information about the file that was written to the control sheet
         write_date = Date
         write_time = Time
         write_info = "Last Wrote on " & write_date & " at " & write_time & ":"
         Workbooks(wname).Worksheets("Control").Range("B20").Value2 = write_info
-        Workbooks(wname).Worksheets("Control").Range("H20").Value2 = SaveName 'Change sheet to say last saved
+        Workbooks(wname).Worksheets("Control").Range("H20").Value2 = savename 'Change sheet to say last saved
         Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
         If ipversion Then
             Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 4.1)"
         Else
             Workbooks(wname).Worksheets("Control").Range("G20").Value2 = "(SES 6.0)"
         End If
-        If Workbooks(wname).Worksheets("Control").CheckBox1.value = True Then
-            Call_SES_Exe (SaveName)
+        If Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 2 Then
+            WriteForm.TextBox2.value = "Running SES Simulation"
+            WriteForm.Repaint
+            Call_SES_Exe wname, savename
+        ElseIf Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 3 Then
+            WriteForm.TextBox2.value = "Running SES and Next-Out"
+            WriteForm.Repaint
+            Call_NextOut wname, savename
         End If
     End If
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure WriteINP: " & Err.Description
-    Err.Clear
-End Sub
-
-Private Sub Call_SES_Exe(path As String)
-    Dim path_exe, shell_command As String
-    On Error GoTo ErrorProc
-    WriteForm.TextBox2.value = "Attempting to run SES"
-    WriteForm.Repaint
-    path_exe = Workbooks(wname).Worksheets("Control").Range("I10").Value2
-    If path_exe <> "" Then
-        shell_command = """" & path_exe & """ """ & path & """"
-        Call Shell(shell_command, vbNormalNoFocus) 'Previously vbNormalFocus
-    End If
-    Exit Sub
-ErrorProc:
-    MsgBox "Error in procedure Call_SES_Exe: " & Err.Description
     Err.Clear
 End Sub
 
@@ -645,6 +680,7 @@ Public Sub choose_ses_exe(wname)
     'routines only work with Variants and Objects.
     Dim vrtSelectedItem As Variant
     'Use a With...End With block to reference the FileDialog object.
+    Get_Control_Values (wname)
     With FD
         'Use the Show method to display the File Picker dialog box and return the user's action.
         'The user pressed the action button.
@@ -663,7 +699,59 @@ Public Sub choose_ses_exe(wname)
         Else: Infile = ""
         End If
     End With
-    Workbooks(wname).Worksheets("Control").Range("I10").Value2 = Infile
+    Workbooks(wname).Worksheets("Control").Range(SES_Exe.Address).Value2 = Infile
+    'Set the object variable to Nothing.
+    Set FD = Nothing
+    Exit Sub
+ErrorProc:
+    MsgBox "Error in procedure choose_ses_exe : " & Err.Description
+    Err.Clear
+End Sub
+
+Public Sub choose_exe(wname, program_name As String)
+    On Error GoTo ErrorProc
+    'Declare a variable as a FileDialog object.
+    Dim FD As FileDialog
+    'Create a FileDialog object as a File Picker dialog box.
+    Set FD = Application.FileDialog(msoFileDialogFilePicker)
+    'Declare a variable to contain the path
+    'of each selected item. Even though the path is a String,
+    'the variable must be a Variant because For Each...Next
+    'routines only work with Variants and Objects.
+    Dim vrtSelectedItem As Variant
+    'Use a With...End With block to reference the FileDialog object.
+    Get_Control_Values (wname)
+    With FD
+        'Use the Show method to display the File Picker dialog box and return the user's action.
+        'The user pressed the action button.
+        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+        .AllowMultiSelect = False
+        .Filters.Clear
+        If program_name = "SES" Or program_name = "NextOut" Then
+            .Filters.Add "Executable Files", "*.EXE", 1
+        ElseIf program_name = "Visio" Then
+            .Filters.Add "Visio Files", "*.vsdx", 1
+        Else
+            .Filters.Add "All Files", "*.E", 1
+        End If
+        If .Show = -1 Then
+            For Each vrtSelectedItem In .SelectedItems
+                'vrtSelectedItem is a String that contains the path of each selected item.
+                'You can use any file I/O functions that you want to work with this path.
+                'This example simply displays the path in a message box.
+                'MsgBox "The path is: " & vrtSelectedItem
+                Infile = vrtSelectedItem
+            Next vrtSelectedItem
+        Else: Infile = ""
+        End If
+    End With
+    If program_name = "SES" Then
+        Workbooks(wname).Worksheets("Control").Range(SES_Exe.Address).Value2 = Infile
+    ElseIf program_name = "NextOut" Then
+        Workbooks(wname).Worksheets("Control").Range(NextOut_Exe.Address).Value2 = Infile
+    ElseIf program_name = "Visio" Then
+        Workbooks(wname).Worksheets("Control").Range(Visio_File.Address).Value2 = Infile
+    End If
     'Set the object variable to Nothing.
     Set FD = Nothing
     Exit Sub

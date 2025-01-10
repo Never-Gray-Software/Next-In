@@ -157,26 +157,34 @@ Public Sub choosefile(Infile)
     'routines only work with Variants and Objects.
     Dim vrtSelectedItem As Variant
     'Use a With...End With block to reference the FileDialog object.
-    With FD
-        'Use the Show method to display the File Picker dialog box and return the user's action.
-        'The user pressed the action button.
-        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
-        .AllowMultiSelect = False
-        .Filters.Clear
-        .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
-        If .Show = -1 Then
-            For Each vrtSelectedItem In .SelectedItems
-                'vrtSelectedItem is a String that contains the path of each selected item.
-                'You can use any file I/O functions that you want to work with this path.
-                'This example simply displays the path in a message box.
-                'MsgBox "The path is: " & vrtSelectedItem
-                Infile = vrtSelectedItem
-            Next vrtSelectedItem
-        Else: Infile = ""
-        End If
-    End With
-    'Set the object variable to Nothing.
-    Set FD = Nothing
+    Dim open_file_dialog As Boolean
+    open_file_dialog = True
+    While open_file_dialog
+        With FD
+            'Use the Show method to display the File Picker dialog box and return the user's action.
+            'The user pressed the action button.
+            If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+            .AllowMultiSelect = False
+            .Filters.Clear
+            .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
+            If .Show = -1 Then
+                For Each vrtSelectedItem In .SelectedItems
+                    'vrtSelectedItem is a String that contains the path of each selected item.
+                    Infile = vrtSelectedItem
+                Next vrtSelectedItem
+            Else: Infile = ""
+            End If
+            'FilePath must be local. I cannot be an http link, which can happen if Excel file is on Sharepoint.
+            If InStr(1, Infile, "http://", vbTextCompare) > 0 Or _
+                InStr(1, Infile, "https://", vbTextCompare) > 0 Then
+                MsgBox "Please select an local input file on a lettered drive (c:\). The current file path references a website, which happens with files on sharepoint."
+                open_file_dialog = True
+            Else: open_file_dialog = False
+            End If
+        End With
+        'Set the object variable to Nothing.
+        Set FD = Nothing
+    Wend
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure choosefile : " & Err.Description
@@ -425,6 +433,7 @@ End Sub
 Private Sub ReadForm5v2()                        'reads information form text file into memory
     On Error GoTo ErrorProc
     Dim f3 As Integer
+    Dim msg As String
     With Workbooks(wname).Worksheets("F05")
         Set FormIn = Workbooks(wname).Worksheets("F05")
         r = 5
@@ -467,8 +476,14 @@ Private Sub ReadForm5v2()                        'reads information form text fi
   
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure ReadForm5 : " & Err.Description
-    Err.Clear
+    msg = "Error in procedure ReadForm5 : " & Err.Description
+    If Err.Description = "Type mismatch" Then
+        msg = msg & vbCrLf & "This can occur when the wrong Unit is selected: SI or IP."
+        MsgBox msg
+    Else
+        MsgBox "Error in procedure ReadForm5 : " & Err.Description
+        Err.Clear
+    End If
 End Sub
 
 Private Sub ReadForm6v2()                        'reads information form text file into memory

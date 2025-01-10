@@ -21,24 +21,6 @@ End Sub
 
 Private Sub Select_Exe_Click()
     Dim wname As String
-    Dim program_name As String
     wname = ActiveWorkbook.Name
-    program_name = "SES"
-    choose_exe wname, program_name
-End Sub
-
-Private Sub Select_NextOut_Click()
-    Dim wname As String
-    Dim program_name As String
-    wname = ActiveWorkbook.Name
-    program_name = "NextOut"
-    choose_exe wname, program_name
-End Sub
-
-Private Sub Select_visio_Click()
-    Dim wname As String
-    Dim program_name As String
-    wname = ActiveWorkbook.Name
-    program_name = "Visio"
-    choose_exe wname, program_name
+    Call choose_ses_exe(wname)
 End Sub
