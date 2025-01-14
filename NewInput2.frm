@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput2
    Caption         =   "Create New Input"
    ClientHeight    =   4515
    ClientLeft      =   60
-   ClientTop       =   210
-   ClientWidth     =   5730
+   ClientTop       =   216
+   ClientWidth     =   5736
    OleObjectBlob   =   "NewInput2.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

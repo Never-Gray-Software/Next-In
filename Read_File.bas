@@ -163,7 +163,7 @@ Public Sub choosefile(Infile)
         With FD
             'Use the Show method to display the File Picker dialog box and return the user's action.
             'The user pressed the action button.
-            If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+            If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.Path
             .AllowMultiSelect = False
             .Filters.Clear
             .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1

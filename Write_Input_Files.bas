@@ -56,11 +56,10 @@ Public SES_Exe As Range
 Public NextOut_Exe As Range
 Public Visio_File As Range
 
-
 Sub Get_Control_Values(wname)
     Set SES_Exe = Workbooks(wname).Worksheets("Control").Range("H14")
     Set NextOut_Exe = Workbooks(wname).Worksheets("Control").Range("H15")
-    Set Write_Options = Workbooks(wname).Worksheets("Control").Range("C13")
+    Set Write_Options = Workbooks(wname).Worksheets("Control").Range("C14")
     Set Visio_File = Workbooks(wname).Worksheets("Control").Range("H17")
 End Sub
 
@@ -602,6 +601,7 @@ End Sub
 
 Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
+    Dim file_selected As Variant
     Dim savename, write_info As String
     Dim write_date, write_time As Variant
     Dim open_save_as_dialog, save_file As Boolean
@@ -615,23 +615,26 @@ Private Sub WriteINP(Optional unit_name As String)
         save_file = True 'save the file!
     End If
     While open_save_as_dialog
-        savename = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
-        If Dir(savename) <> "" Then 'Test if file already exists
-            overwrite_exiting_file = MsgBox("The file already exists. Do you want to overwrite it?", vbYesNoCancel + vbExclamation, "File Exists")
-                Select Case overwrite_exiting_file
-                    Case vbYes ' Overwrite the file
-                        save_file = True
-                        open_save_as_dialog = False
-                    Case vbNo ' Ask user for a new file name
-                        save_file = False
-                        open_save_as_dialog = True
-                    Case vbCancel
-                        save_file = False
-                        open_save_as_dialog = False
-                End Select
-        Else
+        file_selected = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
+        If file_selected = False Then
             open_save_as_dialog = False
-            save_file = True
+            save_file = False
+        Else:
+            savename = CStr(file_selected)
+            If Dir(savename) <> "" Then 'Test if file already exists
+                overwrite_exiting_file = MsgBox("The file already exists. Do you want to overwrite it?", vbYesNoCancel + vbExclamation, "File Exists")
+                    Select Case overwrite_exiting_file
+                        Case vbYes ' Overwrite the file
+                            save_file = True
+                            open_save_as_dialog = False
+                        Case vbNo ' Ask user for a new file name
+                            save_file = False
+                            open_save_as_dialog = True
+                        Case vbCancel
+                            save_file = False
+                            open_save_as_dialog = False
+                    End Select
+            End If
         End If
     Wend
     If save_file Then
@@ -684,7 +687,7 @@ Public Sub choose_ses_exe(wname)
     With FD
         'Use the Show method to display the File Picker dialog box and return the user's action.
         'The user pressed the action button.
-        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.Path
         .AllowMultiSelect = False
         .Filters.Clear
         .Filters.Add "Executable Files", "*.EXE", 1
@@ -724,7 +727,7 @@ Public Sub choose_exe(wname, program_name As String)
     With FD
         'Use the Show method to display the File Picker dialog box and return the user's action.
         'The user pressed the action button.
-        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
+        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.Path
         .AllowMultiSelect = False
         .Filters.Clear
         If program_name = "SES" Or program_name = "NextOut" Then
