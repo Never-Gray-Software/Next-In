@@ -1,12 +1,9 @@
 Attribute VB_Name = "Write_Input_Files"
-'Copyright 2024, Never Gray, Justin Edenbaum P.Eng
-'Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-'1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-'2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-'3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-'Write out input files
+' Project Name: Next-In
+' Description: Writes SES Input files from Next-In to text file
+' Copyright (c) 2025 Justin Edenbaum, Never Gray
+' This file is licensed under the MIT License.
+' You may obtain a copy of the license at https://opensource.org/licenses/MIT
 
 Option Explicit
 
@@ -608,9 +605,9 @@ Private Sub WriteINP(Optional unit_name As String)
         open_save_as_dialog = False
         'TODO Open in last directory saved
         directory_path = Extract_Directory_Path(last_write_file.Value2)
-        ' Check if the directory exists
-        If Dir(directory_path, vbDirectory) <> "" Then
-            ' Change to the specified directory if it exists
+        ' Check if the directory is not blank. If not blank, check the directory exists
+        If directory_path <> "" And Dir(directory_path, vbDirectory) <> "" Then
+            ' Change to the specified directory if it exists (and is not empthy)
             ChDir directory_path
         End If
         file_selected = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
@@ -638,7 +635,7 @@ Private Sub WriteINP(Optional unit_name As String)
     If save_file Then
         Application.DisplayAlerts = False 'False to suppress alert message
         ThisWorkbook.Sheets("Output").Copy
-        ActiveWorkbook.SaveAs FileName:=savename, FileFormat:=xlTextPrinter, CreateBackup:=False
+        ActiveWorkbook.SaveAs fileName:=savename, FileFormat:=xlTextPrinter, CreateBackup:=False
         ActiveWorkbook.Close
         Application.DisplayAlerts = True 'Renable alert messages
         'Add information about the file that was written to the control sheet

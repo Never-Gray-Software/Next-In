@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 Private Sub CancelButton1_Click()
     NewInput.Hide
     MsgBox "PHEW! That was a close one. Be careful and be sure to save your files"

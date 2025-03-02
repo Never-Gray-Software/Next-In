@@ -1,4 +1,9 @@
 Attribute VB_Name = "decimal_conversions"
+' Project Name: Next-In
+' Description: Formats numbers depending on decimal separator being a period or comma (. or ,)
+' Copyright (c) 2025 Justin Edenbaum, Never Gray
+' This file is licensed under the MIT License.
+' You may obtain a copy of the license at https://opensource.org/licenses/MIT
 
 Function Int_International(value As Variant) As Integer
     If VarType(value) = vbString Then
@@ -12,10 +17,3 @@ Function Int_International(value As Variant) As Integer
         Int_International = Int(value)
     End If
 End Function
-
-Sub DetectDecimalSeparator()
-    Dim currentSeparator As String
-    currentSeparator = Application.DecimalSeparator
-    
-    MsgBox "The current decimal separator is '" & currentSeparator & "'."
-End Sub
