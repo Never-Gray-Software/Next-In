@@ -1,12 +1,9 @@
 Attribute VB_Name = "Read_File"
-'Copyright 2024, Never Gray, Justin Edenbaum P.Eng
-'Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-'1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-'2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-'3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-'Read in input files
+' Project Name: Next-In
+' Description: Reads SES input files into Next-In Excel format
+' Copyright (c) 2025 Justin Edenbaum, Never Gray
+' This file is licensed under the MIT License.
+' You may obtain a copy of the license at https://opensource.org/licenses/MIT
 
 Option Explicit
 
@@ -42,17 +39,19 @@ Dim d As String
 Dim ipversion As Boolean
 Dim last_line_with_data As String
 
-Public Sub ReadFile(Optional unit_test As String)
+Sub ReadFile(Optional unit_test As String)
     On Error GoTo ErrorProc
     Dim StartTime As Variant
     Dim cell_value, read_date, read_time As Variant
     Dim read_info As String
     Dim FormIn, Output As Worksheet
     Dim FormRange As Range
+    Dim directory_path As String
     wname = ActiveWorkbook.Name
     'Select Input file with selection screen
-    If unit_test = "" Then
-        Call choosefile(Infile)
+    If unit_test = "" Then 'Call dialog box
+        directory_path = Extract_Directory_Path(last_read_file.Value2)
+        Call choosefile(Infile, directory_path)
         If Infile = "" Then                      'Quit if there is no input file.
             Call Speedon(False)
             Exit Sub
@@ -63,21 +62,21 @@ Public Sub ReadFile(Optional unit_test As String)
     Call Speedon(True)
     StartTime = Timer
     ipversion = is_version_ip(wname)
-    cell_value = Workbooks(wname).Worksheets("Control").Range("G19").Value2 'Value of last read in
+    cell_value = last_read_version.Value2 'Value of last read in
     WriteForm.Show vbModeless
     WriteForm.TextBox2.value = "Adjusting Version"
     Call ip_switch(wname, ipversion, cell_value)
     If Not ipversion Then
-        Workbooks(wname).Worksheets("Control").Range("G19").Value2 = "(SES 6.0)"
+        last_read_version.Value2 = "(SES 6.0)"
     Else
-        Workbooks(wname).Worksheets("Control").Range("G19").Value2 = "(SES 4.1)"
+        last_read_version.Value2 = "(SES 4.1)"
     End If
     read_date = Date
     read_time = Time
     read_info = "Last Read on " & read_date & " at " & read_time & ":"
-    Workbooks(wname).Worksheets("Control").Range("B19").Value2 = read_info
-    Workbooks(wname).Worksheets("Control").Range("H19").Value2 = Infile
-    Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+    last_read_time.Value2 = read_info
+    last_read_file.Value2 = Infile
+    Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     WriteForm.TextBox2.value = "Reading input into memory"
     WriteForm.Repaint
     Call TextFileToArray(Infile)                 'Create an DataArray from the text file for faster processing
@@ -145,7 +144,7 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub choosefile(Infile)
+Public Sub choosefile(Infile, Optional directory_path As String)
     On Error GoTo ErrorProc
     'Declare a variable as a FileDialog object.
     Dim FD As FileDialog
@@ -157,25 +156,33 @@ Public Sub choosefile(Infile)
     'routines only work with Variants and Objects.
     Dim vrtSelectedItem As Variant
     'Use a With...End With block to reference the FileDialog object.
-    With FD
-        'Use the Show method to display the File Picker dialog box and return the user's action.
-        'The user pressed the action button.
-        If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.path
-        .AllowMultiSelect = False
-        .Filters.Clear
-        .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
-        If .Show = -1 Then
-            For Each vrtSelectedItem In .SelectedItems
-                'vrtSelectedItem is a String that contains the path of each selected item.
-                'You can use any file I/O functions that you want to work with this path.
-                'This example simply displays the path in a message box.
-                'MsgBox "The path is: " & vrtSelectedItem
-                Infile = vrtSelectedItem
-            Next vrtSelectedItem
-        Else: Infile = ""
-        End If
-    End With
-    'Set the object variable to Nothing.
+    Dim open_file_dialog As Boolean
+    open_file_dialog = True
+    While open_file_dialog
+        With FD
+            'Use the Show method to display the File Picker dialog box and return the user's action.
+            'The user pressed the action button.
+            .InitialFileName = directory_path
+            .AllowMultiSelect = False
+            .Filters.Clear
+            .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
+            If .Show = -1 Then
+                For Each vrtSelectedItem In .SelectedItems
+                    'vrtSelectedItem is a String that contains the path of each selected item.
+                    Infile = vrtSelectedItem
+                Next vrtSelectedItem
+            Else: Infile = ""
+            End If
+            'FilePath must be local. I cannot be an http link, which can happen if Excel file is on Sharepoint.
+            If InStr(1, Infile, "http://", vbTextCompare) > 0 Or _
+                InStr(1, Infile, "https://", vbTextCompare) > 0 Then
+                MsgBox "Please select an local input file on a lettered drive (c:\). The current file path references a website, which happens with files on sharepoint."
+                open_file_dialog = True
+            Else: open_file_dialog = False
+            End If
+        End With
+        'Set the object variable to Nothing.
+    Wend
     Set FD = Nothing
     Exit Sub
 ErrorProc:
@@ -184,7 +191,7 @@ ErrorProc:
 End Sub
 
 Function is_version_ip(wname)
-    If Workbooks(wname).Worksheets("Control").Range("B2") = 2 Then
+    If si_ip_option = 2 Then
         is_version_ip = True
     Else
         is_version_ip = False
@@ -425,6 +432,7 @@ End Sub
 Private Sub ReadForm5v2()                        'reads information form text file into memory
     On Error GoTo ErrorProc
     Dim f3 As Integer
+    Dim msg As String
     With Workbooks(wname).Worksheets("F05")
         Set FormIn = Workbooks(wname).Worksheets("F05")
         r = 5
@@ -467,8 +475,14 @@ Private Sub ReadForm5v2()                        'reads information form text fi
   
     Exit Sub
 ErrorProc:
-    MsgBox "Error in procedure ReadForm5 : " & Err.Description
-    Err.Clear
+    msg = "Error in procedure ReadForm5 : " & Err.Description
+    If Err.Description = "Type mismatch" Then
+        msg = msg & vbCrLf & "This can occur when the wrong Unit is selected: SI or IP."
+        MsgBox msg
+    Else
+        MsgBox "Error in procedure ReadForm5 : " & Err.Description
+        Err.Clear
+    End If
 End Sub
 
 Private Sub ReadForm6v2()                        'reads information form text file into memory
