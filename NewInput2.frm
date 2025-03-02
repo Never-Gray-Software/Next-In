@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput2 
    Caption         =   "Create New Input"
-   ClientHeight    =   4515
-   ClientLeft      =   60
-   ClientTop       =   216
-   ClientWidth     =   5736
+   ClientHeight    =   5640
+   ClientLeft      =   96
+   ClientTop       =   312
+   ClientWidth     =   7152
    OleObjectBlob   =   "NewInput2.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Option Explicit
 
 Private Sub CancelButton2_Click()
@@ -32,13 +33,13 @@ Private Sub ContinueButton2_Click()
     Call ClearForms(workbookname)
     Call Formulas(workbookname)
     Call ip_switch(workbookname, ipversion, "")
-    Workbooks(workbookname).Worksheets("Control").Range("B19").Value2 = "New File"
-    Workbooks(workbookname).Worksheets("Control").Range("G19").Value2 = ""
-    Workbooks(workbookname).Worksheets("Control").Range("H19").Value2 = ""
+    last_read_time.Value2 = "New File"
+    last_read_version.Value2 = ""
+    last_read_file.Value2 = ""
     If ipversion Then
-        Workbooks(workbookname).Worksheets("Control").Range("B2").Value2 = 2
+        si_ip_cell.Value2 = "2 is the value"
     Else
-        Workbooks(workbookname).Worksheets("Control").Range("B2").Value2 = 1
+        si_ip_cell.Value2 = "1 is the value"
     End If
     WriteForm.Hide
     Call Speedon(False)

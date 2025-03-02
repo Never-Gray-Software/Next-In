@@ -42,17 +42,19 @@ Dim d As String
 Dim ipversion As Boolean
 Dim last_line_with_data As String
 
-Public Sub ReadFile(Optional unit_test As String)
+Sub ReadFile(Optional unit_test As String)
     On Error GoTo ErrorProc
     Dim StartTime As Variant
     Dim cell_value, read_date, read_time As Variant
     Dim read_info As String
     Dim FormIn, Output As Worksheet
     Dim FormRange As Range
+    Dim directory_path As String
     wname = ActiveWorkbook.Name
     'Select Input file with selection screen
-    If unit_test = "" Then
-        Call choosefile(Infile)
+    If unit_test = "" Then 'Call dialog box
+        directory_path = Extract_Directory_Path(last_read_file.Value2)
+        Call choosefile(Infile, directory_path)
         If Infile = "" Then                      'Quit if there is no input file.
             Call Speedon(False)
             Exit Sub
@@ -63,21 +65,21 @@ Public Sub ReadFile(Optional unit_test As String)
     Call Speedon(True)
     StartTime = Timer
     ipversion = is_version_ip(wname)
-    cell_value = Workbooks(wname).Worksheets("Control").Range("G19").Value2 'Value of last read in
+    cell_value = last_read_version.Value2 'Value of last read in
     WriteForm.Show vbModeless
     WriteForm.TextBox2.value = "Adjusting Version"
     Call ip_switch(wname, ipversion, cell_value)
     If Not ipversion Then
-        Workbooks(wname).Worksheets("Control").Range("G19").Value2 = "(SES 6.0)"
+        last_read_version.Value2 = "(SES 6.0)"
     Else
-        Workbooks(wname).Worksheets("Control").Range("G19").Value2 = "(SES 4.1)"
+        last_read_version.Value2 = "(SES 4.1)"
     End If
     read_date = Date
     read_time = Time
     read_info = "Last Read on " & read_date & " at " & read_time & ":"
-    Workbooks(wname).Worksheets("Control").Range("B19").Value2 = read_info
-    Workbooks(wname).Worksheets("Control").Range("H19").Value2 = Infile
-    Workbooks(wname).Worksheets("Control").Range("H21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+    last_read_time.Value2 = read_info
+    last_read_file.Value2 = Infile
+    Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     WriteForm.TextBox2.value = "Reading input into memory"
     WriteForm.Repaint
     Call TextFileToArray(Infile)                 'Create an DataArray from the text file for faster processing
@@ -145,7 +147,7 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub choosefile(Infile)
+Public Sub choosefile(Infile, Optional directory_path As String)
     On Error GoTo ErrorProc
     'Declare a variable as a FileDialog object.
     Dim FD As FileDialog
@@ -163,7 +165,7 @@ Public Sub choosefile(Infile)
         With FD
             'Use the Show method to display the File Picker dialog box and return the user's action.
             'The user pressed the action button.
-            If .InitialFileName = "" Then .InitialFileName = ActiveWorkbook.Path
+            .InitialFileName = directory_path
             .AllowMultiSelect = False
             .Filters.Clear
             .Filters.Add "SES Input Files", "*.SES; *.INP; *.SVS", 1
@@ -183,8 +185,8 @@ Public Sub choosefile(Infile)
             End If
         End With
         'Set the object variable to Nothing.
-        Set FD = Nothing
     Wend
+    Set FD = Nothing
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure choosefile : " & Err.Description
@@ -192,7 +194,7 @@ ErrorProc:
 End Sub
 
 Function is_version_ip(wname)
-    If Workbooks(wname).Worksheets("Control").Range("B2") = 2 Then
+    If si_ip_option = 2 Then
         is_version_ip = True
     Else
         is_version_ip = False

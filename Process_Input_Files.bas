@@ -21,10 +21,11 @@ Public Sub Call_SES_Exe(workbook_name As String, input_file_path)
     On Error GoTo ErrorProc
     WriteForm.TextBox2.value = "Attempting to run SES"
     WriteForm.Repaint
-    Get_Control_Values (workbook_name)
-    path_exe = Path_Format(Range(SES_Exe.Address).Value2)
+    'Get_Control_Values (workbook_name)
+    path_exe = Range(SES_Exe.Address).Value2
     If path_exe <> "" Then
         shell_command = """" & path_exe & """ """ & input_file_path & """"
+        Debug.Print shell_command
         Shell shell_command, vbNormalNoFocus  'Previously vbNormalFocus
     End If
     Exit Sub
@@ -43,35 +44,29 @@ Public Sub Call_NextOut(workbook_name As String, savename)
     Dim settings As Object
     Dim key As Variant
     Dim Proper_Path As String
-    Get_Control_Values (workbook_name)
+    'Get_Control_Values (workbook_name)
     ' Path to your compiled PyInstaller .exe file
     ' Optional: Any command-line arguments you want to pass to the program
     ' <VARIABLES> in the argument statement are replaced below
     argument = " --settings ""{'conversion': '', 'file_type': 'input_file', 'output': [<OUTPUT_SETTING>], 'path_exe': '<SES_EXE>', 'results_folder_str': None, 'ses_output_str': ['<INPUT_FILE>'], 'simtime': -1, 'visio_template': '<VISIO_FILE>'}"""
     ' Construct the command to open cmd and run the program
     output_setting = Get_Output_Setting(workbook_name)
-    Debug.Print "New argument to be seen!"
     Debug.Print output_setting
     Set settings = CreateObject("Scripting.Dictionary")
     settings.Add "<OUTPUT_SETTING>", CStr(output_setting)
     settings.Add "<INPUT_FILE>", Settings_File_Path(savename) 'Get proper format for argument
     settings.Add "<SES_EXE>", Settings_File_Path(Range(SES_Exe.Address).Value2)
     settings.Add "<VISIO_FILE>", Settings_File_Path(Range(Visio_File.Address).Value2)
-    Debug.Print argument
-    Debug.Print "Start replacement"
     For Each key In settings.Keys
         'Debug.Print "Replacing " & key & " with " & settings(key)
         argument = Replace(argument, key, settings(key))
-        Debug.Print argument
     Next key
-    Debug.Print argument
     NextOut_Path = CStr(Range(NextOut_Exe.Address).Value2)
-    shell_command = NextOut_Path & argument
+    shell_command = """" & NextOut_Path & """" & argument
     Debug.Print shell_command
-    Shell shell_command, vbNormalFocus
+    Shell shell_command, vbNormalNoFocus
     WriteForm.TextBox2.value = "Running SES and Next-Out"
     WriteForm.Repaint
-    'TODO: Put in the Output folder name. Eventually, add progress status to Next-Out
     Exit Sub
 ErrorProc:
     MsgBox "Error in procedure Call_NextOut: " & Err.Description
@@ -120,3 +115,9 @@ Function Settings_File_Path(ByVal Original_Path As String) As String
     ' Replace all backslashes with forward slashes
      Settings_File_Path = Replace(Original_Path, "\", "/")
 End Function
+Sub Pulsante22_Click()
+
+End Sub
+Sub Pulsante23_Click()
+
+End Sub
