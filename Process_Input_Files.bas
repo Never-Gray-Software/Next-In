@@ -73,23 +73,27 @@ Function Get_Output_Setting(workbook_name As String) As String
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Excel").ControlFormat.value = xlOn Then
         output_options.Add "Excel"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = xlOn Then
-        output_options.Add "Visio"
-    End If
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Route_Data").ControlFormat.value = xlOn Then
         output_options.Add "Route"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PDF").ControlFormat.value = xlOn Then
-        output_options.Add "visio_2_pdf"
+    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_NO_File").ControlFormat.value = xlOn Then
+        output_options.Add "no_file"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PNG").ControlFormat.value = xlOn Then
-        output_options.Add "visio_2_png"
-    End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_SVG").ControlFormat.value = xlOn Then
-        output_options.Add "visio_2_svg"
-    End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Open_Visio").ControlFormat.value = xlOn Then
-        output_options.Add "visio_open"
+    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = xlOn Then
+        output_options.Add "Visio"
+        ' Add additional visio options if NO_visio is selected.
+        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PDF").ControlFormat.value = xlOn Then
+            output_options.Add "visio_2_pdf"
+        End If
+        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PNG").ControlFormat.value = xlOn Then
+            output_options.Add "visio_2_png"
+        End If
+        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_SVG").ControlFormat.value = xlOn Then
+            output_options.Add "visio_2_svg"
+        End If
+        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Open_Visio").ControlFormat.value = xlOn Then
+            output_options.Add "visio_open"
+        End If
     End If
     str = "' '"
     For Each Item In output_options

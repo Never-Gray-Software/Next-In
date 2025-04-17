@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput2 
    Caption         =   "Create New Input"
    ClientHeight    =   5640
-   ClientLeft      =   96
-   ClientTop       =   312
-   ClientWidth     =   7152
+   ClientLeft      =   90
+   ClientTop       =   315
+   ClientWidth     =   7155
    OleObjectBlob   =   "NewInput2.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
