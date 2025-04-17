@@ -580,10 +580,6 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Sub InitializeRanges()
-    Set ControlSheetRange = ThisWorkbook.Worksheets("Control").Range("I10")
-    Set AnotherRange = ThisWorkbook.Worksheets("Control").Range("J20")
-End Sub
 
 Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
@@ -642,13 +638,13 @@ Private Sub WriteINP(Optional unit_name As String)
         write_date = Date
         write_time = Time
         write_info = "Last Wrote on " & write_date & " at " & write_time & ":"
-        last_write_version.Value2 = write_info
+        last_write_time.Value2 = write_info
         last_write_file.Value2 = savename 'Change sheet to say last saved
         Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
         If ipversion Then
             last_write_version.Value2 = "(SES 4.1)"
         Else
-            last_write_version.Value2 = "(SES 6.0)"
+            last_write_version.Value2 = "(SES 6)"
         End If
         If Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 2 Then
             WriteForm.TextBox2.value = "Running SES Simulation"
@@ -721,6 +717,7 @@ Public Sub choose_exe(wname, program_name As String, Optional directory_path As 
             Workbooks(wname).Worksheets("Control").Range(NextOut_Exe.Address).Value2 = Infile
         ElseIf program_name = "Visio" Then
             Workbooks(wname).Worksheets("Control").Range(Visio_File.Address).Value2 = Infile
+            Workbooks(wname).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = 1
         End If
     End If
     'Set the object variable to Nothing.

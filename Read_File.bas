@@ -497,9 +497,9 @@ Private Sub ReadForm6v2()                        'reads information form text fi
     r = 5
     For f6 = 1 To Val(f1d31)
         c = 2
-        ntype = Int_International(DataArray(L, 1))             'Node Aero Type
-        NTherm = Int_International(DataArray(L, 2))            'Node Thermo Type
-        Call AL2E(L, 3, r, c, FormIn)            ' Read in Form 6A
+        Call AL2E(L, 3, r, c, FormIn)            ' Read in Form 6A. ntype and Ntherm called afterwards. Otherwise, the dataArray value gets a comma.
+        ntype = Int_International(DataArray(L - 1, 1))           'Node Aero Type. L is subtracted by 1 because AL2E advances the line number
+        NTherm = Int_International(DataArray(L - 1, 2))          'Node Thermo Type
         If NTherm = 3 Then
             Call AL2E(L, 6, r, c, FormIn)        'If type 3, read in form 6 boundary condtions
         End If

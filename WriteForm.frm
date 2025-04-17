@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} WriteForm 
    Caption         =   "WORK IN PROGRESS"
    ClientHeight    =   3876
-   ClientLeft      =   96
+   ClientLeft      =   90
    ClientTop       =   480
-   ClientWidth     =   4716
+   ClientWidth     =   4725
    OleObjectBlob   =   "WriteForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
