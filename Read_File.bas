@@ -67,7 +67,7 @@ Sub ReadFile(Optional unit_test As String)
     WriteForm.TextBox2.value = "Adjusting Version"
     Call ip_switch(wname, ipversion, cell_value)
     If Not ipversion Then
-        last_read_version.Value2 = "(SES 6.0)"
+        last_read_version.Value2 = "(SES 6)"
     Else
         last_read_version.Value2 = "(SES 4.1)"
     End If
@@ -957,7 +957,7 @@ Sub ip_switch(wname, ipversion, cell_value)
         si_hide = True
         ip_hide = False
         switch = True
-    ElseIf (cell_value <> "(SES 6.0)" And Not ipversion) Then 'Switch to SI Only
+    ElseIf (cell_value <> "(SES 6)" And Not ipversion) Then 'Switch to SI Only
         si_hide = False
         ip_hide = True
         switch = True

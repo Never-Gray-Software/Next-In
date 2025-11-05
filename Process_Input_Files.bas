@@ -76,8 +76,8 @@ Function Get_Output_Setting(workbook_name As String) As String
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Route_Data").ControlFormat.value = xlOn Then
         output_options.Add "Route"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_NO_File").ControlFormat.value = xlOn Then
-        output_options.Add "no_file"
+    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_H5_File").ControlFormat.value = xlOn Then
+        output_options.Add "H5_file"
     End If
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = xlOn Then
         output_options.Add "Visio"

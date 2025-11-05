@@ -753,28 +753,18 @@ Private Sub FormatNumbersArray()
         For i = LBound(OutputArray, 1) To UBound(OutputArray, 1)
             For J = LBound(OutputArray, 2) To UBound(OutputArray, 2)
                 If Not IsEmpty(OutputArray(i, J)) And IsNumeric(OutputArray(i, J)) Then
-                    If (Abs(OutputArray(i, J)) > 99999999) Or ((Abs(OutputArray(i, J)) < 0.00001) And (OutputArray(i, J) <> 0)) Then
-                        'If value is greater than 8 places or smaller then 5 decimal places
-                        OutputRange(i, J).NumberFormat = "0.000E+00"
-                    ElseIf Len(OutputRange(i, J)) > 9 Then 'If the value is longer than 9 places
-                        Select Case OutputArray(i, J)
-                        Case Is > 10000000
-                            OutputRange(i, J).NumberFormat = "0."
-                        Case Is > 1000000
-                            OutputRange(i, J).NumberFormat = "0.#"
-                        Case Is > 100000
-                            OutputRange(i, J).NumberFormat = "0.##"
-                        Case Is > 10000
-                            OutputRange(i, J).NumberFormat = "0.###"
-                        Case Is > 1000
-                            OutputRange(i, J).NumberFormat = "0.####"
-                        Case Is > 100
-                            OutputRange(i, J).NumberFormat = "0.#####"
-                        Case Is > 10
-                            OutputRange(i, J).NumberFormat = "0.######"
-                        Case Is > 1
-                            OutputRange(i, J).NumberFormat = "0.#######"
-                        End Select
+                    If (OutputArray(i, J) = 0) Then
+                        'If value is 0
+                        OutputRange(i, J).NumberFormat = "0.#######"
+                    ElseIf ((Abs(OutputArray(i, J)) >= 0.0001) And (Abs(OutputArray(i, J)) < 1000000#)) Then
+                        'If value is less than than 6 digits or smaller than 4 decimal places
+                        OutputRange(i, J).NumberFormat = "0." & String((IIf((OutputArray(i, J) < 0), 6, 7) - IIf((Abs(OutputArray(i, J)) >= 1#), Int(Log(Abs(OutputArray(i, J))) / Log(10)), 0)), "#")
+                    ElseIf (Abs(Log(OutputArray(i, J)) / Log(10)) < 10) Then
+                        'If absolute value is greater than 1E-10 and less than 1E+10
+                        OutputRange(i, J).NumberFormat = "0." & String(IIf((OutputArray(i, J) < 0), 3, 4), "0") & "E+0"
+                    Else
+                        'Otherwise (assumes absolute value is within 9.99E+99 and 9.99E-99)
+                        OutputRange(i, J).NumberFormat = "0." & String(IIf((OutputArray(i, J) < 0), 2, 3), "0") & "E+00"
                     End If
                 End If
             Next J
