@@ -50,7 +50,7 @@ Sub ReadFile(Optional unit_test As String)
     wname = ActiveWorkbook.Name
     'Select Input file with selection screen
     If unit_test = "" Then 'Call dialog box
-        directory_path = Extract_Directory_Path(last_read_file.Value2)
+        directory_path = Extract_Directory_Path(last_read_file_path.Value2)
         Call choosefile(Infile, directory_path)
         If Infile = "" Then                      'Quit if there is no input file.
             Call Speedon(False)
@@ -67,16 +67,15 @@ Sub ReadFile(Optional unit_test As String)
     WriteForm.TextBox2.value = "Adjusting Version"
     Call ip_switch(wname, ipversion, cell_value)
     If Not ipversion Then
-        last_read_version.Value2 = "(SES 6.0)"
+        last_read_version.Value2 = "SI"
     Else
-        last_read_version.Value2 = "(SES 4.1)"
+        last_read_version.Value2 = "IP"
     End If
-    read_date = Date
-    read_time = Time
-    read_info = "Last Read on " & read_date & " at " & read_time & ":"
-    last_read_time.Value2 = read_info
-    last_read_file.Value2 = Infile
-    Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+    last_read_date.Value2 = Date
+    last_read_time.Value2 = Time
+    last_read_file_path.Value2 = Infile
+    last_read_file_name.Value2 = Dir(Infile)
+    last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     WriteForm.TextBox2.value = "Reading input into memory"
     WriteForm.Repaint
     Call TextFileToArray(Infile)                 'Create an DataArray from the text file for faster processing
@@ -953,11 +952,11 @@ Sub ip_switch(wname, ipversion, cell_value)
     Row3and4 = Array("F02A", "F02B", "F03", "F04", "F05", "F06", "F07", "F08A", "F08C", "F10", "F11A") 'SI and IP on 3 and 4
     'Last read in is NOT SI, but IP is selected
     switch = False
-    If (cell_value <> "(SES 4.1)" And ipversion) Then
+    If (cell_value <> "IP" And ipversion) Then
         si_hide = True
         ip_hide = False
         switch = True
-    ElseIf (cell_value <> "(SES 6.0)" And Not ipversion) Then 'Switch to SI Only
+    ElseIf (cell_value <> "SI" And Not ipversion) Then 'Switch to SI Only
         si_hide = False
         ip_hide = True
         switch = True

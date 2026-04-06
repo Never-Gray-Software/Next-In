@@ -68,7 +68,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     LC = 2                                       'Most left cell with data
     Calculate                                    'make sure to recalculate any formulas
     ipversion = is_version_ip(wname)
-    Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+    last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
         Set Output = Workbooks(wname).Worksheets("Output")
         WriteForm.TextBox2.value = "Producing Form 1"
@@ -600,7 +600,7 @@ Private Sub WriteINP(Optional unit_name As String)
     While open_save_as_dialog
         open_save_as_dialog = False
         'TODO Open in last directory saved
-        directory_path = Extract_Directory_Path(last_write_file.Value2)
+        directory_path = Extract_Directory_Path(last_write_file_path.Value2)
         ' Check if the directory is not blank. If not blank, check the directory exists
         If directory_path <> "" And Dir(directory_path, vbDirectory) <> "" Then
             ' Change to the specified directory if it exists (and is not empthy)
@@ -635,22 +635,21 @@ Private Sub WriteINP(Optional unit_name As String)
         ActiveWorkbook.Close
         Application.DisplayAlerts = True 'Renable alert messages
         'Add information about the file that was written to the control sheet
-        write_date = Date
-        write_time = Time
-        write_info = "Last Wrote on " & write_date & " at " & write_time & ":"
-        last_write_time.Value2 = write_info
-        last_write_file.Value2 = savename 'Change sheet to say last saved
-        Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+        last_write_date.Value2 = Date
+        last_write_time.Value2 = Time
+        last_write_file_name.Value2 = Dir(savename)
+        last_write_file_path.Value2 = savename 'Change sheet to say last saved
+        last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
         If ipversion Then
-            last_write_version.Value2 = "(SES 4.1)"
+            last_write_version.Value2 = "IP"
         Else
-            last_write_version.Value2 = "(SES 6)"
+            last_write_version.Value2 = "SI"
         End If
-        If Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 2 Then
+        If Write_Option = 2 Then
             WriteForm.TextBox2.value = "Running SES Simulation"
             WriteForm.Repaint
             Call_SES_Exe wname, savename
-        ElseIf Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 3 Then
+        ElseIf Write_Option = 3 Then
             WriteForm.TextBox2.value = "Running SES and Next-Out"
             WriteForm.Repaint
             Call_NextOut wname, savename
@@ -753,28 +752,18 @@ Private Sub FormatNumbersArray()
         For i = LBound(OutputArray, 1) To UBound(OutputArray, 1)
             For J = LBound(OutputArray, 2) To UBound(OutputArray, 2)
                 If Not IsEmpty(OutputArray(i, J)) And IsNumeric(OutputArray(i, J)) Then
-                    If (Abs(OutputArray(i, J)) > 99999999) Or ((Abs(OutputArray(i, J)) < 0.00001) And (OutputArray(i, J) <> 0)) Then
-                        'If value is greater than 8 places or smaller then 5 decimal places
-                        OutputRange(i, J).NumberFormat = "0.000E+00"
-                    ElseIf Len(OutputRange(i, J)) > 9 Then 'If the value is longer than 9 places
-                        Select Case OutputArray(i, J)
-                        Case Is > 10000000
-                            OutputRange(i, J).NumberFormat = "0."
-                        Case Is > 1000000
-                            OutputRange(i, J).NumberFormat = "0.#"
-                        Case Is > 100000
-                            OutputRange(i, J).NumberFormat = "0.##"
-                        Case Is > 10000
-                            OutputRange(i, J).NumberFormat = "0.###"
-                        Case Is > 1000
-                            OutputRange(i, J).NumberFormat = "0.####"
-                        Case Is > 100
-                            OutputRange(i, J).NumberFormat = "0.#####"
-                        Case Is > 10
-                            OutputRange(i, J).NumberFormat = "0.######"
-                        Case Is > 1
-                            OutputRange(i, J).NumberFormat = "0.#######"
-                        End Select
+                    If (OutputArray(i, J) = 0) Then
+                        'If value is 0
+                        OutputRange(i, J).NumberFormat = "0.#######"
+                    ElseIf ((Abs(OutputArray(i, J)) >= 0.0001) And (Abs(OutputArray(i, J)) < 1000000#)) Then
+                        'If value is less than than 6 digits or smaller than 4 decimal places
+                        OutputRange(i, J).NumberFormat = "0." & String((IIf((OutputArray(i, J) < 0), 6, 7) - IIf((Abs(OutputArray(i, J)) >= 1#), Int(Log(Abs(OutputArray(i, J))) / Log(10)), 0)), "#")
+                    ElseIf (Abs(Log(OutputArray(i, J)) / Log(10)) < 10) Then
+                        'If absolute value is greater than 1E-10 and less than 1E+10
+                        OutputRange(i, J).NumberFormat = "0." & String(IIf((OutputArray(i, J) < 0), 3, 4), "0") & "E+0"
+                    Else
+                        'Otherwise (assumes absolute value is within 9.99E+99 and 9.99E-99)
+                        OutputRange(i, J).NumberFormat = "0." & String(IIf((OutputArray(i, J) < 0), 2, 3), "0") & "E+00"
                     End If
                 End If
             Next J
@@ -785,12 +774,16 @@ ErrorProc:
     MsgBox "Error in procedure FormatNumberArray : " & Err.Description
     Err.Clear
 End Sub
-
+'------------------------------------------------------------
+' Procedure: Speedon
+' Purpose:   Improves performance especially when other Excel spreadsheets are open.
+'            This is done by by disabling UI updates and automatic calculation.
+'            Restores settings when done.
+' Arguments: SetOn - True = speed mode on, False = restore mode
+' Notes:     Safe to call repeatedly. Does not change user prefs.
+'------------------------------------------------------------
 Public Sub Speedon(ByVal SetOn As Boolean)
-    'Speeds up processing by turning off some functionality
-    'Sets the application to use Decimal Seperartor as a period.
     On Error GoTo ErrorProc
-    Dim temp As Integer
     With Application
         If SetOn Then
             .Calculation = xlCalculationManual
@@ -806,10 +799,13 @@ Public Sub Speedon(ByVal SetOn As Boolean)
             .EnableEvents = True
             .DisplayAlerts = True
             .Cursor = xlDefault
+            .DisplayStatusBar = True
             .StatusBar = False
         End If
     End With
+
     Exit Sub
+
 ErrorProc:
     MsgBox "Error in procedure Speedon, hit Reset : " & Err.Description
     Err.Clear

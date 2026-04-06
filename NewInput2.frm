@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} NewInput2 
    Caption         =   "Create New Input"
-   ClientHeight    =   5640
-   ClientLeft      =   90
-   ClientTop       =   315
-   ClientWidth     =   7155
+   ClientHeight    =   7050
+   ClientLeft      =   120
+   ClientTop       =   435
+   ClientWidth     =   8940.001
    OleObjectBlob   =   "NewInput2.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -35,12 +35,29 @@ Private Sub ContinueButton2_Click()
     Call Formulas(workbookname)
     Call ip_switch(workbookname, ipversion, "")
     last_read_time.Value2 = "New File"
+    last_read_date.Value2 = "New File"
     last_read_version.Value2 = ""
-    last_read_file.Value2 = ""
-    If ipversion Then
-        si_ip_cell.Value2 = "2 is the value"
+    last_read_file_name.Value2 = ""
+    last_read_file_path.Value2 = ""
+    last_read_file_name = "New File"
+    If Not ipversion Then
+        last_read_version.Value2 = "SI"
     Else
-        si_ip_cell.Value2 = "1 is the value"
+        last_read_version.Value2 = "IP"
+    End If
+    last_read_date.Value2 = ""
+    last_read_time.Value2 = ""
+    last_read_file_path.Value2 = ""
+    last_write_file_name.Value2 = ""
+    last_write_version.Value2 = ""
+    last_write_date.Value2 = ""
+    last_write_time.Value2 = ""
+    last_write_file_path.Value2 = ""
+    last_used_by.Value2 = Workbooks(workbookname).BuiltinDocumentProperties("Last Author")
+    If ipversion Then
+        si_ip_cell.Value2 = 2
+    Else
+        si_ip_cell.Value2 = 1
     End If
     WriteForm.Hide
     Call Speedon(False)
