@@ -68,7 +68,7 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     LC = 2                                       'Most left cell with data
     Calculate                                    'make sure to recalculate any formulas
     ipversion = is_version_ip(wname)
-    Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+    last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
         Set Output = Workbooks(wname).Worksheets("Output")
         WriteForm.TextBox2.value = "Producing Form 1"
@@ -600,7 +600,7 @@ Private Sub WriteINP(Optional unit_name As String)
     While open_save_as_dialog
         open_save_as_dialog = False
         'TODO Open in last directory saved
-        directory_path = Extract_Directory_Path(last_write_file.Value2)
+        directory_path = Extract_Directory_Path(last_write_file_path.Value2)
         ' Check if the directory is not blank. If not blank, check the directory exists
         If directory_path <> "" And Dir(directory_path, vbDirectory) <> "" Then
             ' Change to the specified directory if it exists (and is not empthy)
@@ -635,22 +635,21 @@ Private Sub WriteINP(Optional unit_name As String)
         ActiveWorkbook.Close
         Application.DisplayAlerts = True 'Renable alert messages
         'Add information about the file that was written to the control sheet
-        write_date = Date
-        write_time = Time
-        write_info = "Last Wrote on " & write_date & " at " & write_time & ":"
-        last_write_time.Value2 = write_info
-        last_write_file.Value2 = savename 'Change sheet to say last saved
-        Workbooks(wname).Worksheets("Control").Range("G21").Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+        last_write_date.Value2 = Date
+        last_write_time.Value2 = Time
+        last_write_file_name.Value2 = Dir(savename)
+        last_write_file_path.Value2 = savename 'Change sheet to say last saved
+        last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
         If ipversion Then
-            last_write_version.Value2 = "(SES 4.1)"
+            last_write_version.Value2 = "IP"
         Else
-            last_write_version.Value2 = "(SES 6)"
+            last_write_version.Value2 = "SI"
         End If
-        If Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 2 Then
+        If Write_Option = 2 Then
             WriteForm.TextBox2.value = "Running SES Simulation"
             WriteForm.Repaint
             Call_SES_Exe wname, savename
-        ElseIf Workbooks(wname).Worksheets("Control").Range(Write_Options.Address).Value2 = 3 Then
+        ElseIf Write_Option = 3 Then
             WriteForm.TextBox2.value = "Running SES and Next-Out"
             WriteForm.Repaint
             Call_NextOut wname, savename
@@ -775,12 +774,16 @@ ErrorProc:
     MsgBox "Error in procedure FormatNumberArray : " & Err.Description
     Err.Clear
 End Sub
-
+'------------------------------------------------------------
+' Procedure: Speedon
+' Purpose:   Improves performance especially when other Excel spreadsheets are open.
+'            This is done by by disabling UI updates and automatic calculation.
+'            Restores settings when done.
+' Arguments: SetOn - True = speed mode on, False = restore mode
+' Notes:     Safe to call repeatedly. Does not change user prefs.
+'------------------------------------------------------------
 Public Sub Speedon(ByVal SetOn As Boolean)
-    'Speeds up processing by turning off some functionality
-    'Sets the application to use Decimal Seperartor as a period.
     On Error GoTo ErrorProc
-    Dim temp As Integer
     With Application
         If SetOn Then
             .Calculation = xlCalculationManual
@@ -796,10 +799,13 @@ Public Sub Speedon(ByVal SetOn As Boolean)
             .EnableEvents = True
             .DisplayAlerts = True
             .Cursor = xlDefault
+            .DisplayStatusBar = True
             .StatusBar = False
         End If
     End With
+
     Exit Sub
+
 ErrorProc:
     MsgBox "Error in procedure Speedon, hit Reset : " & Err.Description
     Err.Clear

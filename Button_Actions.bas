@@ -9,31 +9,40 @@ Option Explicit
 
 Public si_ip_option As Variant
 Public si_ip_cell As Range
-Public Write_Options As Range
+Public Write_Option As Integer
 Public SES_Exe As Range
 Public NextOut_Exe As Range
 Public Visio_File As Range
-Public last_read_time As Range
-Public last_read_version As Range
-Public last_read_file As Range
-Public last_write_time As Range
-Public last_write_version As Range
-Public last_write_file As Range
+Public last_read_file_name  As Range
+Public last_read_version    As Range
+Public last_read_date       As Range
+Public last_read_time       As Range
+Public last_read_file_path  As Range
+Public last_write_file_name As Range
+Public last_write_version   As Range
+Public last_write_date      As Range
+Public last_write_time      As Range
+Public last_write_file_path As Range
+Public last_used_by         As Range
 
 ' Set location of information to read and write on Control Sheet
 Sub Get_Control_Values(wname)
     Set si_ip_cell = Workbooks(wname).Worksheets("Control").Range("B2")
     si_ip_option = si_ip_cell.Value2
-    Set SES_Exe = Workbooks(wname).Worksheets("Control").Range("F13")
-    Set NextOut_Exe = Workbooks(wname).Worksheets("Control").Range("F14")
-    Set Write_Options = Workbooks(wname).Worksheets("Control").Range("C14")
-    Set Visio_File = Workbooks(wname).Worksheets("Control").Range("F17")
-    Set last_read_time = Workbooks(wname).Worksheets("Control").Range("B19")
-    Set last_read_version = Workbooks(wname).Worksheets("Control").Range("F19")
-    Set last_read_file = Workbooks(wname).Worksheets("Control").Range("G19")
-    Set last_write_time = Workbooks(wname).Worksheets("Control").Range("B20")
-    Set last_write_version = Workbooks(wname).Worksheets("Control").Range("F20")
-    Set last_write_file = Workbooks(wname).Worksheets("Control").Range("G20")
+    Set SES_Exe = Workbooks(wname).Worksheets("Control").Range("F8")
+    Set NextOut_Exe = Workbooks(wname).Worksheets("Control").Range("F9")
+    Set Visio_File = Workbooks(wname).Worksheets("Control").Range("F10")
+    Set last_read_file_name = Workbooks(wname).Worksheets("Control").Range("C15")
+    Set last_read_version = Workbooks(wname).Worksheets("Control").Range("F15")
+    Set last_read_date = Workbooks(wname).Worksheets("Control").Range("G15")
+    Set last_read_time = Workbooks(wname).Worksheets("Control").Range("H15")
+    Set last_read_file_path = Workbooks(wname).Worksheets("Control").Range("I15")
+    Set last_write_file_name = Workbooks(wname).Worksheets("Control").Range("C16")
+    Set last_write_version = Workbooks(wname).Worksheets("Control").Range("F16")
+    Set last_write_date = Workbooks(wname).Worksheets("Control").Range("G16")
+    Set last_write_time = Workbooks(wname).Worksheets("Control").Range("H16")
+    Set last_write_file_path = Workbooks(wname).Worksheets("Control").Range("I16")
+    Set last_used_by = Workbooks(wname).Worksheets("Control").Range("C18")
 End Sub
 
 'Extract just the directory from a path that includes a file
@@ -69,7 +78,26 @@ End Sub
 
 Sub write_button()
     Dim wname As String
+    Dim Write_Options As Integer
     wname = ActiveWorkbook.Name
+    Write_Option = 1
+    Get_Control_Values (wname)
+    Call WriteFile
+End Sub
+
+Sub run_SES_button()
+    Dim wname As String
+    Dim Write_Options As Integer
+    wname = ActiveWorkbook.Name
+    Write_Option = 2
+    Get_Control_Values (wname)
+    Call WriteFile
+End Sub
+Sub run_next_out_button()
+    Dim wname As String
+    Dim Write_Options As Integer
+    wname = ActiveWorkbook.Name
+    Write_Option = 3
     Get_Control_Values (wname)
     Call WriteFile
 End Sub
