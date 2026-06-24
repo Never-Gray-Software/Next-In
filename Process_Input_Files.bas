@@ -12,12 +12,13 @@ Public Sub Call_SES_Exe(workbook_name As String, input_file_path)
     On Error GoTo ErrorProc
     WriteForm.TextBox2.value = "Attempting to run SES"
     WriteForm.Repaint
-    'Get_Control_Values (workbook_name)
-    path_exe = Range(SES_Exe.Address).Value2
-    If path_exe <> "" Then
+    path_exe = SES_Exe
+    If Dir(SES_Exe) <> "" Then
         shell_command = """" & path_exe & """ """ & input_file_path & """"
         Debug.Print shell_command
         Shell shell_command, vbNormalNoFocus  'Previously vbNormalFocus
+    Else
+        MsgBox "SES executable not found at: " & path_exe
     End If
     Exit Sub
 ErrorProc:
@@ -25,34 +26,60 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub Call_NextOut(workbook_name As String, savename)
+Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional iteration_path As String = "", Optional ses_version As String = "SI")
     On Error GoTo ErrorProc
-    WriteForm.TextBox2.value = "Attempting to run SES and Next-Out"
+    If iteration_path = "" Then
+        WriteForm.TextBox2.value = "Attempting to run Next-Out, then SES"
+    Else
+        WriteForm.TextBox2.value = "Writing Iterations with Next-Out"
+    End If
     WriteForm.Repaint
+    If Dir(NextOut_Exe) = "" Then
+        MsgBox "Next Out executable not found at: " & NextOut_Exe
+        Exit Sub
+    End If
     Dim shell_command As String, output_setting As String
     Dim Path_of_Next_Out As String
     Dim argument As String, NextOut_Path As String, msg As String
     Dim settings As Object
     Dim key As Variant
     Dim Proper_Path As String
-    'Get_Control_Values (workbook_name)
     ' Path to your compiled PyInstaller .exe file
     ' Optional: Any command-line arguments you want to pass to the program
     ' <VARIABLES> in the argument statement are replaced below
-    argument = " --settings ""{'conversion': '', 'file_type': 'input_file', 'output': [<OUTPUT_SETTING>], 'path_exe': '<SES_EXE>', 'results_folder_str': None, 'ses_output_str': ['<INPUT_FILE>'], 'simtime': -1, 'visio_template': '<VISIO_FILE>'}"""
+    ' ERASE ME  --settings "{'file_type': 'input_file', 'output': [' ', 'H5_file', 'Visio'], 'path_exe': '-30', 'ses_output_str': ['<SES_OUTPUT_STR>'], 'simtime': -1, 'visio_template': '0', 'save_path': 'C:\temp', 'ses_version': 'SI'}"
+    argument = " --settings ""{" & _
+           "'conversion': '', " & _
+           "'file_type': '<FILE_TYPE>', " & _
+           "'output': [<OUTPUT_SETTING>], " & _
+           "'path_exe': '<SES_EXE>', " & _
+           "'ses_output_str': ['<SES_OUTPUT_STR>'], " & _
+           "'simtime': -1, " & _
+           "'visio_template': '<VISIO_FILE>', " & _
+           "'iteration_path': '<ITERATION_PATH>', " & _
+           "'ses_version': '<SES_VERSION>'" & _
+           "}"""
     ' Construct the command to open cmd and run the program
     output_setting = Get_Output_Setting(workbook_name)
     Debug.Print output_setting
     Set settings = CreateObject("Scripting.Dictionary")
     settings.Add "<OUTPUT_SETTING>", CStr(output_setting)
-    settings.Add "<INPUT_FILE>", Settings_File_Path(savename) 'Get proper format for argument
-    settings.Add "<SES_EXE>", Settings_File_Path(Range(SES_Exe.Address).Value2)
-    settings.Add "<VISIO_FILE>", Settings_File_Path(Range(Visio_File.Address).Value2)
+    settings.Add "<SES_EXE>", Settings_File_Path(SES_Exe)
+    settings.Add "<SES_OUTPUT_STR>", Settings_File_Path(savename)
+    settings.Add "<VISIO_FILE>", Settings_File_Path(Visio_File)
+    If iteration_path = "" Then 'Creating one input file and post-processing with Next-Out
+        settings.Add "<FILE_TYPE>", "input_file"
+    Else 'Next-Out will create iterations files in the save_path
+        settings.Add "<FILE_TYPE>", "iteration"
+        settings.Add "<ITERATION_PATH>", Settings_File_Path(iteration_path)
+        settings.Add "<SES_VERSION>", get_ses_version()
+    End If
     For Each key In settings.Keys
         'Debug.Print "Replacing " & key & " with " & settings(key)
         argument = Replace(argument, key, settings(key))
     Next key
-    NextOut_Path = CStr(Range(NextOut_Exe.Address).Value2)
+    Debug.Print argument
+    NextOut_Path = CStr(NextOut_Exe)
     shell_command = """" & NextOut_Path & """" & argument
     Debug.Print shell_command
     Shell shell_command, vbNormalNoFocus
@@ -110,9 +137,11 @@ Function Settings_File_Path(ByVal Original_Path As String) As String
     ' Replace all backslashes with forward slashes
      Settings_File_Path = Replace(Original_Path, "\", "/")
 End Function
-Sub Pulsante22_Click()
 
-End Sub
-Sub Pulsante23_Click()
-
-End Sub
+Function get_ses_version()
+    If si_ip_option = 1 Then
+        get_ses_version = "SI"
+    Else
+        get_ses_version = "IP"
+    End If
+End Function

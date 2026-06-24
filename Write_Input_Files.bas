@@ -650,7 +650,7 @@ Private Sub WriteINP(Optional unit_name As String)
             WriteForm.Repaint
             Call_SES_Exe wname, savename
         ElseIf Write_Option = 3 Then
-            WriteForm.TextBox2.value = "Running SES and Next-Out"
+            WriteForm.TextBox2.value = "Running Next-Out, then SES"
             WriteForm.Repaint
             Call_NextOut wname, savename
         End If

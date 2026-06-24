@@ -136,3 +136,11 @@ Sub Select_visio_button()
     choose_exe wname, program_name, directory_path
 End Sub
 
+Sub Write_Iteration_Files_button()
+    Dim wname As String
+    Dim Write_Options As Integer
+    wname = ActiveWorkbook.Name
+    Get_Control_Values (wname)
+    Call Write_Iteration_Files(wname)
+End Sub
+

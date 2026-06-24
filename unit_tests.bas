@@ -41,9 +41,9 @@ Sub FindFilesInFolders(ByVal HostFolder As String, FileTypes As Variant)
         Get_Control_Values (wname)
         For Each Fil In hFolder.Files
             'cutomized code
-            ReadFile (Fil.path)
-            num = Len(Fil.path)
-            unit_output = Left(Fil.path, num - 4) + ".nxi"
+            ReadFile (Fil.Path)
+            num = Len(Fil.Path)
+            unit_output = Left(Fil.Path, num - 4) + ".nxi"
             WriteFile (unit_output)
         Next Fil
         ' make recursive call, if main folder contains subfolder
@@ -57,9 +57,9 @@ Sub FindFilesInFolders(ByVal HostFolder As String, FileTypes As Variant)
         For Each SubFolder In hFolder.SubFolders
             For Each Fil In SubFolder.Files
                 'cutomized code
-                ReadFile (Fil.path)
-                num = Len(Fil.path)
-                unit_output = Left(Fil.path, num - 4) + ".nxi"
+                ReadFile (Fil.Path)
+                num = Len(Fil.Path)
+                unit_output = Left(Fil.Path, num - 4) + ".nxi"
                 WriteFile (unit_output)
             Next Fil
             ' make recursive call, if subfolder contains subfolders
