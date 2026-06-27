@@ -26,7 +26,7 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional iteration_path As String = "", Optional ses_version As String = "SI")
+Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional next_in_path As String = "", Optional iteration_path As String = "", Optional ses_version As String = "SI", Optional file_type As String = "next_in")
     On Error GoTo ErrorProc
     If iteration_path = "" Then
         WriteForm.TextBox2.value = "Attempting to run Next-Out, then SES"
@@ -47,9 +47,8 @@ Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional i
     ' Path to your compiled PyInstaller .exe file
     ' Optional: Any command-line arguments you want to pass to the program
     ' <VARIABLES> in the argument statement are replaced below
-    ' ERASE ME  --settings "{'file_type': 'input_file', 'output': [' ', 'H5_file', 'Visio'], 'path_exe': '-30', 'ses_output_str': ['<SES_OUTPUT_STR>'], 'simtime': -1, 'visio_template': '0', 'save_path': 'C:\temp', 'ses_version': 'SI'}"
     argument = " --settings ""{" & _
-           "'conversion': '', " & _
+           "'output_conversion': '<OUTPUT_CONVERSION>', " & _
            "'file_type': '<FILE_TYPE>', " & _
            "'output': [<OUTPUT_SETTING>], " & _
            "'path_exe': '<SES_EXE>', " & _
@@ -57,23 +56,23 @@ Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional i
            "'simtime': -1, " & _
            "'visio_template': '<VISIO_FILE>', " & _
            "'iteration_path': '<ITERATION_PATH>', " & _
-           "'ses_version': '<SES_VERSION>'" & _
+           "'ses_version': '<SES_VERSION>', " & _
+           "'next_in_path': '<NEXT_IN_PATH>'" & _
+           "'segments_2_lookup':'<SUMMARY_NUMBERS>'" & _
            "}"""
     ' Construct the command to open cmd and run the program
     output_setting = Get_Output_Setting(workbook_name)
     Debug.Print output_setting
     Set settings = CreateObject("Scripting.Dictionary")
-    settings.Add "<OUTPUT_SETTING>", CStr(output_setting)
+    settings.Add "<OUTPUT_CONVERSION>", output_conversion_string
     settings.Add "<SES_EXE>", Settings_File_Path(SES_Exe)
     settings.Add "<SES_OUTPUT_STR>", Settings_File_Path(savename)
     settings.Add "<VISIO_FILE>", Settings_File_Path(Visio_File)
-    If iteration_path = "" Then 'Creating one input file and post-processing with Next-Out
-        settings.Add "<FILE_TYPE>", "input_file"
-    Else 'Next-Out will create iterations files in the save_path
-        settings.Add "<FILE_TYPE>", "iteration"
-        settings.Add "<ITERATION_PATH>", Settings_File_Path(iteration_path)
-        settings.Add "<SES_VERSION>", get_ses_version()
-    End If
+    settings.Add "<SES_VERSION>", ses_version
+    settings.Add "<FILE_TYPE>", file_type
+    settings.Add "<ITERATION_PATH>", Settings_File_Path(iteration_path)
+    settings.Add "<NEXT_IN_PATH>", Settings_File_Path(next_in_path)
+    settings.Add "<SUMMARY_NUMBERS>", summary_numbers
     For Each key In settings.Keys
         'Debug.Print "Replacing " & key & " with " & settings(key)
         argument = Replace(argument, key, settings(key))
@@ -106,6 +105,9 @@ Function Get_Output_Setting(workbook_name As String) As String
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_H5_File").ControlFormat.value = xlOn Then
         output_options.Add "H5_file"
     End If
+    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Summary").ControlFormat.value = xlOn Then
+        output_options.Add "Summary"
+    End If
     If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = xlOn Then
         output_options.Add "Visio"
         ' Add additional visio options if NO_visio is selected.
@@ -137,7 +139,7 @@ Function Settings_File_Path(ByVal Original_Path As String) As String
     ' Replace all backslashes with forward slashes
      Settings_File_Path = Replace(Original_Path, "\", "/")
 End Function
-
+' abandoned
 Function get_ses_version()
     If si_ip_option = 1 Then
         get_ses_version = "SI"
@@ -145,3 +147,4 @@ Function get_ses_version()
         get_ses_version = "IP"
     End If
 End Function
+

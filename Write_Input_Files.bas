@@ -49,7 +49,7 @@ Dim segtype As Integer
 
 
 
-Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
+Public Sub WriteFile(Optional Unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
     'unit_name is used for unit_tests. Otherwise, the value should be empty
     On Error GoTo ErrorProc
     wname = ActiveWorkbook.Name
@@ -564,13 +564,13 @@ Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Workshee
     WriteForm.Repaint
     Call FormatNumbersArray                      'Adjust numerical format
     EndTime = Timer
-    Debug.Print unit_name & " Time after formating before save: " & (EndTime - StartTime)
+    Debug.Print Unit_name & " Time after formating before save: " & (EndTime - StartTime)
     WriteForm.TextBox2.value = "Exporting File"
     Call Speedon(False)                          'Enable items that previously slowed down processing.
-    If unit_name = "" Then
+    If Unit_name = "" Then
         Call WriteINP                            'Write out file to text file
     Else
-        Call WriteINP(unit_name)
+        Call WriteINP(Unit_name)
     End If
     WriteForm.Hide
     Exit Sub
@@ -581,53 +581,23 @@ ErrorProc:
 End Sub
 
 
-Private Sub WriteINP(Optional unit_name As String)
+Private Sub WriteINP(Optional Unit_name As String)
     On Error GoTo ErrorProc
     Dim file_selected As Variant
-    Dim savename, write_info As String
+    Dim savename As String
+    Dim write_info As String
     Dim write_date, write_time As Variant
     Dim open_save_as_dialog, save_file As Boolean
     Dim overwrite_exiting_file As VbMsgBoxResult
     Dim directory_path As String
     savename = ""
-    If unit_name = "" Then
-        open_save_as_dialog = True 'Open the save as dialog box
+    If Unit_name = "" Then
+        Call get_savename(savename, save_file)
     Else
-        savename = unit_name
+        savename = Unit_name
         open_save_as_dialog = False 'skip the save as dialog box
         save_file = True 'save the file!
     End If
-    While open_save_as_dialog
-        open_save_as_dialog = False
-        'TODO Open in last directory saved
-        directory_path = Extract_Directory_Path(last_write_file_path.Value2)
-        ' Check if the directory is not blank. If not blank, check the directory exists
-        If directory_path <> "" And Dir(directory_path, vbDirectory) <> "" Then
-            ' Change to the specified directory if it exists (and is not empthy)
-            ChDir directory_path
-        End If
-        file_selected = Application.GetSaveAsFilename(fileFilter:="SES Input File (*.inp), *.inp", Title:="Save SES Input File")
-        If file_selected = False Then
-            save_file = False
-        Else:
-            savename = CStr(file_selected)
-            save_file = True
-            If Dir(savename) <> "" Then 'Test if file already exists
-                overwrite_exiting_file = MsgBox("The file already exists. Do you want to overwrite it?", vbYesNoCancel + vbExclamation, "File Exists")
-                    Select Case overwrite_exiting_file
-                        Case vbYes ' Overwrite the file
-                            save_file = True
-                            open_save_as_dialog = False
-                        Case vbNo ' Ask user for a new file name
-                            save_file = False
-                            open_save_as_dialog = True
-                        Case vbCancel
-                            save_file = False
-                            open_save_as_dialog = False
-                    End Select
-            End If
-        End If
-    Wend
     If save_file Then
         Application.DisplayAlerts = False 'False to suppress alert message
         ThisWorkbook.Sheets("Output").Copy
