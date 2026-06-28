@@ -26,119 +26,177 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub Call_NextOut(workbook_name As String, savename As Variant, Optional next_in_path As String = "", Optional iteration_path As String = "", Optional ses_version As String = "SI", Optional file_type As String = "next_in")
+Public Sub Call_NextOut(workbook_name As String, savename As Variant, _
+    Optional next_in_path As String = "", Optional iteration_path As String = "", _
+    Optional ses_version As String = "SI", Optional file_type As String = "next_in")
+
     On Error GoTo ErrorProc
-    If iteration_path = "" Then
+
+    ' Status message
+    If Len(iteration_path) = 0 Then
         WriteForm.TextBox2.value = "Attempting to run Next-Out, then SES"
     Else
         WriteForm.TextBox2.value = "Writing Iterations with Next-Out"
     End If
     WriteForm.Repaint
-    If Dir(NextOut_Exe) = "" Then
-        MsgBox "Next Out executable not found at: " & NextOut_Exe
+
+    ' Convert NextOut_Exe (Range ? String)
+    Dim nextout_path As String
+    nextout_path = CStr(NextOut_Exe.Value2)
+
+    If Dir(nextout_path) = "" Then
+        MsgBox "Next Out executable not found at: " & nextout_path
         Exit Sub
     End If
-    Dim shell_command As String, output_setting As String
-    Dim Path_of_Next_Out As String
-    Dim argument As String, NextOut_Path As String, msg As String
-    Dim settings As Object
-    Dim key As Variant
-    Dim Proper_Path As String
-    ' Path to your compiled PyInstaller .exe file
-    ' Optional: Any command-line arguments you want to pass to the program
-    ' <VARIABLES> in the argument statement are replaced below
-    argument = " --settings ""{" & _
-           "'output_conversion': '<OUTPUT_CONVERSION>', " & _
-           "'file_type': '<FILE_TYPE>', " & _
-           "'output': [<OUTPUT_SETTING>], " & _
-           "'path_exe': '<SES_EXE>', " & _
-           "'ses_output_str': ['<SES_OUTPUT_STR>'], " & _
-           "'simtime': -1, " & _
-           "'visio_template': '<VISIO_FILE>', " & _
-           "'iteration_path': '<ITERATION_PATH>', " & _
-           "'ses_version': '<SES_VERSION>', " & _
-           "'next_in_path': '<NEXT_IN_PATH>'" & _
-           "'segments_2_lookup':'<SUMMARY_NUMBERS>'" & _
-           "}"""
-    ' Construct the command to open cmd and run the program
-    output_setting = Get_Output_Setting(workbook_name)
-    Debug.Print output_setting
-    Set settings = CreateObject("Scripting.Dictionary")
-    settings.Add "<OUTPUT_CONVERSION>", output_conversion_string
-    settings.Add "<SES_EXE>", Settings_File_Path(SES_Exe)
-    settings.Add "<SES_OUTPUT_STR>", Settings_File_Path(savename)
-    settings.Add "<VISIO_FILE>", Settings_File_Path(Visio_File)
-    settings.Add "<SES_VERSION>", ses_version
-    settings.Add "<FILE_TYPE>", file_type
-    settings.Add "<ITERATION_PATH>", Settings_File_Path(iteration_path)
-    settings.Add "<NEXT_IN_PATH>", Settings_File_Path(next_in_path)
-    settings.Add "<SUMMARY_NUMBERS>", summary_numbers
-    For Each key In settings.Keys
-        'Debug.Print "Replacing " & key & " with " & settings(key)
-        argument = Replace(argument, key, settings(key))
-    Next key
+
+    Dim settings_dict As Object
+    Dim shell_command As String
+    Dim argument As String
+
+    Set settings_dict = CreateObject("Scripting.Dictionary")
+
+    ' --- BASIC SETTINGS ---
+    settings_dict("output_conversion") = output_conversion_string
+    settings_dict("file_type") = file_type
+    settings_dict("output") = Get_Output_Setting(workbook_name)
+
+    ' SES_Exe (Range ? String)
+    settings_dict("path_exe") = Settings_File_Path(CStr(SES_Exe.Value2))
+
+    ' ses_output_str MUST be a list
+    If Len(CStr(savename)) = 0 Then
+        settings_dict("ses_output_str") = Array("")
+    Else
+        settings_dict("ses_output_str") = Array(Settings_File_Path(CStr(savename)))
+    End If
+
+    settings_dict("simtime") = -1
+
+    ' Visio template (Range ? String)
+    settings_dict("visio_template") = Settings_File_Path(CStr(Visio_File.Value2))
+
+    ' --- ITERATION PATH LOGIC (CRITICAL FIX) ---
+    Dim iter_path As String
+    iter_path = CStr(iteration_path)
+
+    If Len(iter_path) = 0 Then
+        ' Normal mode ? Python expects empty string
+        settings_dict("iteration_path") = ""
+    Else
+        ' Iteration mode ? real folder path
+        settings_dict("iteration_path") = Settings_File_Path(iter_path)
+    End If
+
+    ' --- SES VERSION ---
+    settings_dict("ses_version") = ses_version
+
+    ' --- NEXT-IN PATH ---
+    settings_dict("next_in_path") = Settings_File_Path(CStr(next_in_path))
+
+    ' --- SUMMARY NUMBERS (only if Summary is selected) ---
+    If UBound(Filter(settings_dict("output"), "Summary")) >= 0 Then
+        Dim seg As String
+        seg = CStr(summary_numbers.Value2)
+    
+        If Len(seg) = 0 Then
+            settings_dict("segments_2_lookup") = Array()
+        ElseIf InStr(seg, ",") > 0 Then
+            settings_dict("segments_2_lookup") = Split(seg, ",")
+        Else
+            settings_dict("segments_2_lookup") = Array(seg)
+        End If
+    End If
+
+    ' --- SERIALIZE PYTHON DICT ---
+    Dim settings_literal As String
+    settings_literal = PyDict(settings_dict)
+    
+    ' Escape internal quotes for Windows Shell
+    settings_literal = Replace(settings_literal, """", """""")
+    
+    argument = " --settings """ & settings_literal & """"
+
+    Debug.Print "FINAL PYTHON DICT:"
     Debug.Print argument
-    NextOut_Path = CStr(NextOut_Exe)
-    shell_command = """" & NextOut_Path & """" & argument
+
+    ' --- BUILD COMMAND ---
+    shell_command = """" & nextout_path & """" & argument
     Debug.Print shell_command
+
+    ' --- RUN NEXT-OUT ---
     Shell shell_command, vbNormalNoFocus
+
     WriteForm.TextBox2.value = "Running SES and Next-Out"
     WriteForm.Repaint
     Exit Sub
+
 ErrorProc:
     MsgBox "Error in procedure Call_NextOut: " & Err.Description
     Err.Clear
 End Sub
 
-Function Get_Output_Setting(workbook_name As String) As String
+
+
+
+
+
+
+
+Function Get_Output_Setting(workbook_name As String) As Variant
     On Error GoTo ErrorProc
-    Dim str As String
+
     Dim output_options As Collection
     Set output_options = New Collection
-    Dim Item As Variant
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Excel").ControlFormat.value = xlOn Then
+
+    Dim ws As Worksheet
+    Set ws = Workbooks(workbook_name).Worksheets("Control")
+
+    If ws.Shapes("NO_Excel").ControlFormat.value = xlOn Then
         output_options.Add "Excel"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Route_Data").ControlFormat.value = xlOn Then
+    If ws.Shapes("NO_Route_Data").ControlFormat.value = xlOn Then
         output_options.Add "Route"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_H5_File").ControlFormat.value = xlOn Then
+    If ws.Shapes("NO_H5_File").ControlFormat.value = xlOn Then
         output_options.Add "H5_file"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Summary").ControlFormat.value = xlOn Then
+    If ws.Shapes("NO_Summary").ControlFormat.value = xlOn Then
         output_options.Add "Summary"
     End If
-    If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Visio").ControlFormat.value = xlOn Then
+    If ws.Shapes("NO_Visio").ControlFormat.value = xlOn Then
         output_options.Add "Visio"
-        ' Add additional visio options if NO_visio is selected.
-        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PDF").ControlFormat.value = xlOn Then
+
+        If ws.Shapes("NO_PDF").ControlFormat.value = xlOn Then
             output_options.Add "visio_2_pdf"
         End If
-        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_PNG").ControlFormat.value = xlOn Then
+        If ws.Shapes("NO_PNG").ControlFormat.value = xlOn Then
             output_options.Add "visio_2_png"
         End If
-        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_SVG").ControlFormat.value = xlOn Then
+        If ws.Shapes("NO_SVG").ControlFormat.value = xlOn Then
             output_options.Add "visio_2_svg"
         End If
-        If Workbooks(workbook_name).Worksheets("Control").Shapes("NO_Open_Visio").ControlFormat.value = xlOn Then
+        If ws.Shapes("NO_Open_Visio").ControlFormat.value = xlOn Then
             output_options.Add "visio_open"
         End If
     End If
-    str = "' '"
-    For Each Item In output_options
-        str = str & ", '" & Item & "'"
-    Next Item
-    Get_Output_Setting = str
+
+    ' Convert collection ? array
+    Dim arr() As String
+    ReDim arr(0 To output_options.Count - 1)
+
+    Dim i As Long
+    For i = 1 To output_options.Count
+        arr(i - 1) = output_options(i)
+    Next i
+
+    Get_Output_Setting = arr
     Exit Function
+
 ErrorProc:
-    MsgBox "Error in procedure Get_Output_Settings: " & Err.Description
+    MsgBox "Error in procedure Get_Output_Setting: " & Err.Description
     Err.Clear
 End Function
 
-Function Settings_File_Path(ByVal Original_Path As String) As String
-    ' Replace all backslashes with forward slashes
-     Settings_File_Path = Replace(Original_Path, "\", "/")
-End Function
 ' abandoned
 Function get_ses_version()
     If si_ip_option = 1 Then
@@ -147,4 +205,40 @@ Function get_ses_version()
         get_ses_version = "IP"
     End If
 End Function
+
+Private Function PyValue(v As Variant) As String
+    Dim s As String
+    Dim i As Long
+
+    If IsArray(v) Then
+        s = "["
+        For i = LBound(v) To UBound(v)
+            s = s & PyValue(v(i)) & ", "
+        Next i
+        If Right(s, 2) = ", " Then s = Left(s, Len(s) - 2)
+        PyValue = s & "]"
+
+    ElseIf IsNumeric(v) Then
+        PyValue = CStr(v)
+
+    Else
+        PyValue = "'" & Replace(CStr(v), "'", "''") & "'"
+    End If
+End Function
+
+
+Private Function PyDict(dict As Object) As String
+    Dim key As Variant
+    Dim s As String
+
+    s = "{"
+    For Each key In dict.Keys
+        s = s & "'" & key & "': " & PyValue(dict(key)) & ", "
+    Next key
+
+    If Right(s, 2) = ", " Then s = Left(s, Len(s) - 2)
+    PyDict = s & "}"
+End Function
+
+
 

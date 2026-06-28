@@ -69,3 +69,17 @@ Public Sub CleanupLocalCopies()
     Kill tempPath
     On Error GoTo 0
 End Sub
+
+Function Settings_File_Path(ByVal Original_Path As String) As String
+    ' Replace all backslashes with forward slashes
+    Settings_File_Path = Replace(Original_Path, "\", "/")
+End Function
+
+'Extract just the directory from a path that includes a file
+Function Extract_Directory_Path(file_path As String) As String
+    If file_path = "" Then
+        Extract_Directory_Path = ""
+    Else
+        Extract_Directory_Path = Left(file_path, InStrRev(file_path, "\"))
+    End If
+End Function

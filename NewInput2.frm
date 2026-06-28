@@ -55,9 +55,9 @@ Private Sub ContinueButton2_Click()
     last_write_file_path.Value2 = ""
     last_used_by.Value2 = Workbooks(workbookname).BuiltinDocumentProperties("Last Author")
     If ipversion Then
-        si_ip_cell.Value2 = 2
+        si_ip_option.Value2 = 2
     Else
-        si_ip_cell.Value2 = 1
+        si_ip_option.Value2 = 1
     End If
     WriteForm.Hide
     Call Speedon(False)
