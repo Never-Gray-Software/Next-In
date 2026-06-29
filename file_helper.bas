@@ -45,7 +45,7 @@ Sub get_savename(ByRef savename As String, ByRef save_file As Boolean, Optional 
 End Sub
 
 ' Creates a guaranteed local copy of the current workbook
-Public Function GetLocalCopyPath() As String
+Public Function GetLocalCopyPath(wname As String) As String
     Dim tempPath As String
     tempPath = Environ$("TEMP") & "\NextIn_LocalCopy.xlsx"
 
@@ -54,21 +54,12 @@ Public Function GetLocalCopyPath() As String
     Kill tempPath
     On Error GoTo 0
 
-    ' Save a fresh local copy
-    ThisWorkbook.SaveCopyAs tempPath
-
+    ' Save a fresh local copy of the workbook being converted
+    Workbooks(wname).SaveCopyAs tempPath
+    
     GetLocalCopyPath = tempPath
 End Function
 
-' Deletes the temporary local copy of Next-In, if it exists
-Public Sub CleanupLocalCopies()
-    Dim tempPath As String
-    tempPath = Environ$("TEMP") & "\NextIn_LocalCopy.xlsx"
-    
-    On Error Resume Next
-    Kill tempPath
-    On Error GoTo 0
-End Sub
 
 Function Settings_File_Path(ByVal Original_Path As String) As String
     ' Replace all backslashes with forward slashes
@@ -81,5 +72,31 @@ Function Extract_Directory_Path(file_path As String) As String
         Extract_Directory_Path = ""
     Else
         Extract_Directory_Path = Left(file_path, InStrRev(file_path, "\"))
+    End If
+End Function
+' Clean up temporary files
+Public Sub delete_temp_files(wname As String)
+    Dim localCopy As String
+    Dim tempFile As String
+    Dim folder As String
+
+    localCopy = GetLocalCopyPath(wname)
+    folder = Extract_Directory_Path(localCopy)
+
+    tempFile = folder & "\temporary_input_file_for_convert_in_excel.inp"
+    If Dir(tempFile) <> "" Then Kill tempFile
+
+    If Dir(localCopy) <> "" Then Kill localCopy
+End Sub
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call delete_temp_files(ThisWorkbook.Name)
+End Sub
+
+Public Function is_version_ip() As Boolean
+    If si_ip_option.Value2 = 2 Then
+        is_version_ip = True
+    Else
+        is_version_ip = False
     End If
 End Function

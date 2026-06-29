@@ -55,7 +55,7 @@ Sub Write_Iteration_Files(wname As String)
     Dim initialFolder As String
 
     ' Create a guaranteed local copy of Next-In
-    localCopyPath = GetLocalCopyPath()
+    localCopyPath = GetLocalCopyPath(wname)
 
     ' Choose the folder where iteration files will be written
     initialFolder = ThisWorkbook.Path
@@ -73,3 +73,6 @@ Sub Write_Iteration_Files(wname As String)
         next_in_path:=localCopyPath, _
         iteration_path:=iterationPath
 End Sub
+
+
+

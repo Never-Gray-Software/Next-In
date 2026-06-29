@@ -53,7 +53,8 @@ Public Sub WriteFile(Optional Unit_name As String) 'Copy data from Form Workshee
     'unit_name is used for unit_tests. Otherwise, the value should be empty
     On Error GoTo ErrorProc
     wname = ActiveWorkbook.Name
-    'Get_Control_Values (wname) 'Get settings from Control worksheet
+    Get_Control_Values (wname) 'Get settings from Control worksheet
+    ipversion = is_version_ip()
     Dim num_sections, num_vents, num_line_sec As Integer 'Variables for Form 2
     Dim StartTime, Ftime, EndTime As Double
     StartTime = Timer
@@ -67,7 +68,6 @@ Public Sub WriteFile(Optional Unit_name As String) 'Copy data from Form Workshee
     TC = 5                                       'Top Cell with Data on most sheets
     LC = 2                                       'Most left cell with data
     Calculate                                    'make sure to recalculate any formulas
-    ipversion = is_version_ip(wname)
     last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
     With Workbooks(wname)
         Set Output = Workbooks(wname).Worksheets("Output")

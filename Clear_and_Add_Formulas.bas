@@ -417,3 +417,25 @@ ErrorProc:
     Err.Clear
 End Sub
 
+Public Sub Reset_All_NextOut_Options(workbook_name As String)
+    Dim ws As Worksheet
+    Set ws = Workbooks(workbook_name).Worksheets("Control")
+
+    ' --- Main Next-Out toggles ---
+    ws.Shapes("NO_Excel").ControlFormat.value = xlOff
+    ws.Shapes("NO_Route_Data").ControlFormat.value = xlOff
+    ws.Shapes("NO_H5_File").ControlFormat.value = xlOff
+    ws.Shapes("NO_Summary").ControlFormat.value = xlOff
+    ws.Shapes("NO_Visio").ControlFormat.value = xlOff
+
+    ' --- Visio sub-options ---
+    ws.Shapes("NO_PDF").ControlFormat.value = xlOff
+    ws.Shapes("NO_PNG").ControlFormat.value = xlOff
+    ws.Shapes("NO_SVG").ControlFormat.value = xlOff
+    ws.Shapes("NO_Open_Visio").ControlFormat.value = xlOff
+    
+    
+    ' --- Summary options
+    ws.Shapes("NO_Fire_Segment").ControlFormat.value = xlOff
+    summary_numbers.Value2 = ""   ' ? Erase summary numbers
+End Sub

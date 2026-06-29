@@ -8,8 +8,8 @@ Attribute VB_Name = "Button_Actions"
 Option Explicit
 
 Public si_ip_option As Range
-Public conversion As Range
-Public output_conversion_option As Variant
+Public input_conversion As Range
+Public output_conversion_option As Range
 Public output_conversion_string As String
 Public Write_Option As Integer
 Public summary_numbers As Range
@@ -42,10 +42,8 @@ Sub Get_Control_Values(wname As String)
 
     ' --- Ranges that you modify later ---
     Set si_ip_option = ctl.Range("B2")
-    Set conversion = ctl.Range("B6")
-
-    ' --- Values ---
-    output_conversion_option = CV(ctl, "C6")
+    Set input_conversion = ctl.Range("B6")
+    Set output_conversion_option = ctl.Range("C6")
 
     ' --- Ranges for executable / template paths ---
     Set SES_Exe = ctl.Range("F8")
@@ -83,7 +81,7 @@ Sub new_button()
     Dim wname As String
     wname = ActiveWorkbook.Name
     Get_Control_Values wname
-    NewInput.SES4p1_Check1.value = is_version_ip(wname)
+    NewInput.SES4p1_Check1.value = is_version_ip()
     NewInput.Show
 End Sub
 
@@ -106,6 +104,14 @@ Sub write_button()
     Get_Control_Values wname
     Call select_creation_method(wname)
 End Sub
+
+Sub convert_values_in_excel_button()
+    Dim wname As String
+    wname = ActiveWorkbook.Name
+    Get_Control_Values wname
+    cell_convert.Show
+End Sub
+
 
 Sub run_SES_button()
     Dim wname As String
@@ -159,17 +165,24 @@ Sub Select_visio_button()
 End Sub
 
 Sub Write_Iteration_Files_button()
-    Dim wname As String
-    Dim Write_Options As Integer
-    wname = ActiveWorkbook.Name
-    Get_Control_Values wname
-    Call Write_Iteration_Files(wname)
+    'Dim wname As String
+    'Dim Write_Options As Integer
+    'wname = ActiveWorkbook.Name
+    'Get_Control_Values wname
+    'Call Write_Iteration_Files(wname)
+    MsgBox "Email Justin@NeverGray.biz for more information." & vbCrLf & vbCrLf & _
+       "The iteration feature works with Next-In 4.4 and Next-Out 2.3." & vbCrLf & vbCrLf & _
+       "The update to converting the SES inputs in Next-In 5.0 and Next-Out 5.0 requires this feature to be updated."
+End Sub
+
+Sub Write_Iteration_and_run_next_out()
+    Call Write_Iteration_Files_button
 End Sub
 
 Sub select_creation_method(wname As String)
     Dim ses_version As String
     Dim next_in_path As String
-    If conversion.Value2 = 1 Then
+    If input_conversion.Value2 = 1 Then
         Call WriteFile
     Else
         Call Next_out_conversion(wname)
@@ -180,13 +193,13 @@ Sub Next_out_conversion(wname As String)
     Dim ses_version As String
     Dim next_in_path As String
     
-    If conversion.Value2 = 2 And si_ip_option.Value2 = 1 Then
+    If input_conversion.Value2 = 2 And si_ip_option.Value2 = 1 Then
         ses_version = "SI_TO_IP"
-    ElseIf conversion.Value2 = 3 And si_ip_option.Value2 = 2 Then
+    ElseIf input_conversion.Value2 = 3 And si_ip_option.Value2 = 2 Then
         ses_version = "IP_TO_SI"
     Else
         ses_version = "Conflict"
-        MsgBox "Error! Input and conversion settings don't match."
+        MsgBox "Error! Read In Units and Input Conversion don't match."
         Exit Sub
     End If
     
@@ -196,7 +209,7 @@ Sub Next_out_conversion(wname As String)
     
     If Not save_file Then Exit Sub
     
-    next_in_path = GetLocalCopyPath()
+    next_in_path = GetLocalCopyPath(wname)
     
     Call_NextOut _
         workbook_name:=wname, _
@@ -227,4 +240,82 @@ Sub Next_out_conversion(wname As String)
     End If
 End Sub
 
+Public Sub convert_in_excel()
+    On Error GoTo ConvertError
 
+    Dim wname As String
+    Dim from_units As Long        ' 1 = SI, 2 = IP
+    Dim to_units As Long
+    Dim ses_version As String
+    Dim next_in_path As String
+    Dim temp_input_2_read_in As String
+    Dim temp_folder As String
+
+    wname = ActiveWorkbook.Name
+    Get_Control_Values wname
+
+    ' --- Current units of the workbook being converted ---
+    from_units = si_ip_option.Value2   ' 1 = SI, 2 = IP
+
+    ' --- Decide conversion direction and target units ---
+    Select Case input_conversion.Value2
+        Case 2          ' SI -> IP
+            If from_units <> 1 Then
+                MsgBox "Error! Read In Units must be SI for SI to IP conversion.", vbCritical
+                Exit Sub
+            End If
+            ses_version = "SI_TO_IP"
+            to_units = 2
+
+        Case 3          ' IP -> SI
+            If from_units <> 2 Then
+                MsgBox "Error! Read In Units must be IP for IP to SI conversion.", vbCritical
+                Exit Sub
+            End If
+            ses_version = "IP_TO_SI"
+            to_units = 1
+
+        Case Else
+            MsgBox "Error! Invalid Input Conversion option.", vbCritical
+            Exit Sub
+    End Select
+
+    ' --- Create guaranteed local copy of Next-In ---
+    next_in_path = GetLocalCopyPath(wname)
+
+    If Dir(next_in_path) = "" Then
+        MsgBox "Local Next-In file not found: " & next_in_path, vbCritical
+        Exit Sub
+    End If
+
+    ' --- Build temporary converted input file path ---
+    temp_folder = Extract_Directory_Path(next_in_path)
+    temp_input_2_read_in = temp_folder & "\temporary_input_file_for_convert_in_excel.inp"
+
+    ' --- Run Next-Out to create converted file ---
+    Call_NextOut _
+        workbook_name:=wname, _
+        savename:=temp_input_2_read_in, _
+        next_in_path:=next_in_path, _
+        ses_version:=ses_version, _
+        file_type:="next_in"
+
+    If Dir(temp_input_2_read_in) = "" Then
+        MsgBox "Next-Out did not produce a converted file.", vbCritical
+        Exit Sub
+    End If
+
+    ' --- Close the dialog ---
+    cell_convert.Hide
+
+    ' --- NOW switch the read-in units to match the converted file ---
+    si_ip_option.Value2 = to_units
+
+    ' --- Read the converted file back into Excel ---
+    Call ReadFile(temp_input_2_read_in)
+    Exit Sub
+
+ConvertError:
+    MsgBox "Error converting values in Excel: " & Err.Description, vbCritical
+    cell_convert.Hide
+End Sub

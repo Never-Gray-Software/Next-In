@@ -7,7 +7,7 @@ Attribute VB_Name = "unit_tests"
 
 Dim blNotFirstIteration As Boolean
 Dim Fil As File
-Dim hFolder As Folder, SubFolder As Folder
+Dim hFolder As folder, SubFolder As folder
 Dim FileExt As String
 Dim FSO As Scripting.FileSystemObject
 Dim wname As String

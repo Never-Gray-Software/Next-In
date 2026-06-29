@@ -105,6 +105,15 @@ Public Sub Call_NextOut(workbook_name As String, savename As Variant, _
         Else
             settings_dict("segments_2_lookup") = Array(seg)
         End If
+        
+        ' Fire segment option
+        Dim ws As Worksheet
+        Set ws = Workbooks(workbook_name).Worksheets("Control")
+    
+        If ws.Shapes("NO_Fire_Segment").ControlFormat.value = xlOn Then
+            settings_dict("lookup_fire_data") = True   ' FIXED KEY NAME
+        End If
+        
     End If
 
     ' --- SERIALIZE PYTHON DICT ---
@@ -134,13 +143,6 @@ ErrorProc:
     MsgBox "Error in procedure Call_NextOut: " & Err.Description
     Err.Clear
 End Sub
-
-
-
-
-
-
-
 
 Function Get_Output_Setting(workbook_name As String) As Variant
     On Error GoTo ErrorProc
@@ -181,14 +183,19 @@ Function Get_Output_Setting(workbook_name As String) As Variant
     End If
 
     ' Convert collection ? array
+    If output_options.Count = 0 Then
+        Get_Output_Setting = Array()   ' ? clean, simple, safe
+        Exit Function
+    End If
+    
     Dim arr() As String
     ReDim arr(0 To output_options.Count - 1)
-
+    
     Dim i As Long
     For i = 1 To output_options.Count
         arr(i - 1) = output_options(i)
     Next i
-
+    
     Get_Output_Setting = arr
     Exit Function
 

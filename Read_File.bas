@@ -40,6 +40,9 @@ Dim ipversion As Boolean
 Dim last_line_with_data As String
 
 Sub ReadFile(Optional unit_test As String)
+    wname = ActiveWorkbook.Name
+    Call Get_Control_Values(wname)
+    ipversion = is_version_ip()
     On Error GoTo ErrorProc
     Dim StartTime As Variant
     Dim cell_value, read_date, read_time As Variant
@@ -47,7 +50,6 @@ Sub ReadFile(Optional unit_test As String)
     Dim FormIn, Output As Worksheet
     Dim FormRange As Range
     Dim directory_path As String
-    wname = ActiveWorkbook.Name
     'Select Input file with selection screen
     If unit_test = "" Then 'Call dialog box
         directory_path = Extract_Directory_Path(last_read_file_path.Value2)
@@ -61,7 +63,6 @@ Sub ReadFile(Optional unit_test As String)
     End If
     Call Speedon(True)
     StartTime = Timer
-    ipversion = is_version_ip(wname)
     cell_value = last_read_version.Value2 'Value of last read in
     WriteForm.Show vbModeless
     WriteForm.TextBox2.value = "Adjusting Version"
@@ -189,13 +190,6 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Function is_version_ip(wname)
-    If si_ip_option = 2 Then
-        is_version_ip = True
-    Else
-        is_version_ip = False
-    End If
-End Function
 
 Private Sub ReadForm1v2()
     On Error GoTo ErrorProc

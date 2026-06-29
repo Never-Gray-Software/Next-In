@@ -24,16 +24,20 @@ End Sub
 
 Private Sub ContinueButton2_Click()
     Dim workbookname As String
+    workbookname = ActiveWorkbook.Name
+    Get_Control_Values workbookname
     Dim ipversion As Boolean
     Dim wname_local As String
     ipversion = NewInput2.SES4p1_Check2.value
     NewInput2.Hide
-    workbookname = ActiveWorkbook.Name
     WriteForm.Show vbModeless
     Call Speedon(True)
     Call ClearForms(workbookname)
     Call Formulas(workbookname)
     Call ip_switch(workbookname, ipversion, "")
+    input_conversion.Value2 = 1
+    output_conversion_option.Value2 = 1
+    Call Reset_All_NextOut_Options(ActiveWorkbook.Name)
     last_read_time.Value2 = "New File"
     last_read_date.Value2 = "New File"
     last_read_version.Value2 = ""
