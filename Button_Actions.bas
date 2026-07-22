@@ -123,13 +123,26 @@ Sub run_SES_button()
 End Sub
 
 Sub run_next_out_button()
+    On Error GoTo NextOutError
+
     Dim wname As String
-    Dim Write_Options As Integer
     wname = ActiveWorkbook.Name
+
     Write_Option = 3
     Get_Control_Values wname
+
+    ' Attempt the conversion
     Call select_creation_method(wname)
+
+    Exit Sub
+
+NextOutError:
+    MsgBox "Something went wrong calling Next-Out." & vbCrLf & vbCrLf & _
+           "Error details:" & vbCrLf & Err.Description & vbCrLf & vbCrLf & _
+           "If the problem persists, write the input file and run Next-Out manually.", _
+           vbCritical, "Next-Out Error"
 End Sub
+
 
 Sub Select_Exe_button()
     Dim wname As String
@@ -165,157 +178,24 @@ Sub Select_visio_button()
 End Sub
 
 Sub Write_Iteration_Files_button()
-    'Dim wname As String
-    'Dim Write_Options As Integer
-    'wname = ActiveWorkbook.Name
-    'Get_Control_Values wname
-    'Call Write_Iteration_Files(wname)
-    MsgBox "Email Justin@NeverGray.biz for more information." & vbCrLf & vbCrLf & _
-       "The iteration feature works with Next-In 4.4 and Next-Out 2.3." & vbCrLf & vbCrLf & _
-       "The update to converting the SES inputs in Next-In 5.0 and Next-Out 5.0 requires this feature to be updated."
+    Dim wname As String
+    Dim Write_Options As Integer
+    wname = ActiveWorkbook.Name
+    Get_Control_Values wname
+    Call Write_Iteration_Files(wname)
 End Sub
 
 Sub Write_Iteration_and_run_next_out()
-    Call Write_Iteration_Files_button
+    MsgBox "Use Write Iteration Files and call Next-Out seperately. Future versions will enable running simulations directly from Next-In."
 End Sub
 
-Sub select_creation_method(wname As String)
+Sub select_creation_method(wname As String, Optional unit_name As String)
     Dim ses_version As String
     Dim next_in_path As String
+    If Len(unit_name) = 0 Then unit_name = ""
     If input_conversion.Value2 = 1 Then
-        Call WriteFile
+        Call WriteFile(unit_name)
     Else
-        Call Next_out_conversion(wname)
+        Call Next_out_conversion(wname, unit_name)
     End If
-End Sub
-
-Sub Next_out_conversion(wname As String)
-    Dim ses_version As String
-    Dim next_in_path As String
-    
-    If input_conversion.Value2 = 2 And si_ip_option.Value2 = 1 Then
-        ses_version = "SI_TO_IP"
-    ElseIf input_conversion.Value2 = 3 And si_ip_option.Value2 = 2 Then
-        ses_version = "IP_TO_SI"
-    Else
-        ses_version = "Conflict"
-        MsgBox "Error! Read In Units and Input Conversion don't match."
-        Exit Sub
-    End If
-    
-    Dim savename As String
-    Dim save_file As Boolean
-    Call get_savename(savename, save_file)
-    
-    If Not save_file Then Exit Sub
-    
-    next_in_path = GetLocalCopyPath(wname)
-    
-    Call_NextOut _
-        workbook_name:=wname, _
-        savename:=savename, _
-        next_in_path:=next_in_path, _
-        ses_version:=ses_version, _
-        file_type:="next_in"
-
-    If Write_Option = 2 Then
-        WriteForm.TextBox2.value = "Running SES Simulation"
-        WriteForm.Repaint
-        Call_SES_Exe wname, savename
-
-    ElseIf Write_Option = 3 Then
-        WriteForm.TextBox2.value = "Running Next-Out, then SES"
-        WriteForm.Repaint
-
-        If ses_version = "IP_TO_SI" Then
-            ses_version = "SI"
-        Else
-            ses_version = "IP"
-        End If
-
-        Call_NextOut wname, savename, ses_version:=ses_version, file_type:="input_file"
-
-    Else
-        MsgBox "Converted file created:" & vbCrLf & vbCrLf & savename, vbInformation, "Next-Out Complete"
-    End If
-End Sub
-
-Public Sub convert_in_excel()
-    On Error GoTo ConvertError
-
-    Dim wname As String
-    Dim from_units As Long        ' 1 = SI, 2 = IP
-    Dim to_units As Long
-    Dim ses_version As String
-    Dim next_in_path As String
-    Dim temp_input_2_read_in As String
-    Dim temp_folder As String
-
-    wname = ActiveWorkbook.Name
-    Get_Control_Values wname
-
-    ' --- Current units of the workbook being converted ---
-    from_units = si_ip_option.Value2   ' 1 = SI, 2 = IP
-
-    ' --- Decide conversion direction and target units ---
-    Select Case input_conversion.Value2
-        Case 2          ' SI -> IP
-            If from_units <> 1 Then
-                MsgBox "Error! Read In Units must be SI for SI to IP conversion.", vbCritical
-                Exit Sub
-            End If
-            ses_version = "SI_TO_IP"
-            to_units = 2
-
-        Case 3          ' IP -> SI
-            If from_units <> 2 Then
-                MsgBox "Error! Read In Units must be IP for IP to SI conversion.", vbCritical
-                Exit Sub
-            End If
-            ses_version = "IP_TO_SI"
-            to_units = 1
-
-        Case Else
-            MsgBox "Error! Invalid Input Conversion option.", vbCritical
-            Exit Sub
-    End Select
-
-    ' --- Create guaranteed local copy of Next-In ---
-    next_in_path = GetLocalCopyPath(wname)
-
-    If Dir(next_in_path) = "" Then
-        MsgBox "Local Next-In file not found: " & next_in_path, vbCritical
-        Exit Sub
-    End If
-
-    ' --- Build temporary converted input file path ---
-    temp_folder = Extract_Directory_Path(next_in_path)
-    temp_input_2_read_in = temp_folder & "\temporary_input_file_for_convert_in_excel.inp"
-
-    ' --- Run Next-Out to create converted file ---
-    Call_NextOut _
-        workbook_name:=wname, _
-        savename:=temp_input_2_read_in, _
-        next_in_path:=next_in_path, _
-        ses_version:=ses_version, _
-        file_type:="next_in"
-
-    If Dir(temp_input_2_read_in) = "" Then
-        MsgBox "Next-Out did not produce a converted file.", vbCritical
-        Exit Sub
-    End If
-
-    ' --- Close the dialog ---
-    cell_convert.Hide
-
-    ' --- NOW switch the read-in units to match the converted file ---
-    si_ip_option.Value2 = to_units
-
-    ' --- Read the converted file back into Excel ---
-    Call ReadFile(temp_input_2_read_in)
-    Exit Sub
-
-ConvertError:
-    MsgBox "Error converting values in Excel: " & Err.Description, vbCritical
-    cell_convert.Hide
 End Sub

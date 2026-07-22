@@ -49,7 +49,7 @@ Dim segtype As Integer
 
 
 
-Public Sub WriteFile(Optional Unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
+Public Sub WriteFile(Optional unit_name As String) 'Copy data from Form Worksheets to Output Worksheet
     'unit_name is used for unit_tests. Otherwise, the value should be empty
     On Error GoTo ErrorProc
     wname = ActiveWorkbook.Name
@@ -564,13 +564,13 @@ Public Sub WriteFile(Optional Unit_name As String) 'Copy data from Form Workshee
     WriteForm.Repaint
     Call FormatNumbersArray                      'Adjust numerical format
     EndTime = Timer
-    Debug.Print Unit_name & " Time after formating before save: " & (EndTime - StartTime)
+    Debug.Print unit_name & " Time after formating before save: " & (EndTime - StartTime)
     WriteForm.TextBox2.value = "Exporting File"
     Call Speedon(False)                          'Enable items that previously slowed down processing.
-    If Unit_name = "" Then
+    If unit_name = "" Then
         Call WriteINP                            'Write out file to text file
     Else
-        Call WriteINP(Unit_name)
+        Call WriteINP(unit_name)
     End If
     WriteForm.Hide
     Exit Sub
@@ -581,7 +581,7 @@ ErrorProc:
 End Sub
 
 
-Private Sub WriteINP(Optional Unit_name As String)
+Private Sub WriteINP(Optional unit_name As String)
     On Error GoTo ErrorProc
     Dim file_selected As Variant
     Dim savename As String
@@ -591,10 +591,10 @@ Private Sub WriteINP(Optional Unit_name As String)
     Dim overwrite_exiting_file As VbMsgBoxResult
     Dim directory_path As String
     savename = ""
-    If Unit_name = "" Then
+    If unit_name = "" Then
         Call get_savename(savename, save_file)
     Else
-        savename = Unit_name
+        savename = unit_name
         open_save_as_dialog = False 'skip the save as dialog box
         save_file = True 'save the file!
     End If

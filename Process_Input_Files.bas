@@ -132,11 +132,24 @@ Public Sub Call_NextOut(workbook_name As String, savename As Variant, _
     shell_command = """" & nextout_path & """" & argument
     Debug.Print shell_command
 
-    ' --- RUN NEXT-OUT ---
-    Shell shell_command, vbNormalNoFocus
-
+    ' --- RUN NEXT-OUT, Wait Until Finished, Check File is written out ---
     WriteForm.TextBox2.value = "Running SES and Next-Out"
     WriteForm.Repaint
+    Dim sh As Object, procID As Long
+    Set sh = CreateObject("WScript.Shell")
+    
+    procID = sh.Run(shell_command, 1, True)  ' Wait until Python finishes
+    
+    If procID <> 0 Then
+        WriteForm.TextBox2.value = "Next-Out failed"
+        WriteForm.Repaint
+    
+        MsgBox "Next-Out failed with exit code: " & procID & vbCrLf & _
+               "Check the Python log or console output.", _
+               vbCritical, "Next-Out Error"
+    
+        Exit Sub
+    End If
     Exit Sub
 
 ErrorProc:

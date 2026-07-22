@@ -53,10 +53,14 @@ Sub Write_Iteration_Files(wname As String)
     Dim iterationPath As String
     Dim localCopyPath As String
     Dim initialFolder As String
-
+    If input_conversion <> 1 Then
+         MsgBox "Iteration function is currently not compatible with Input Conversions. Select Input Conversion: None to continue."
+         Exit Sub
+    End If
+    
     ' Create a guaranteed local copy of Next-In
     localCopyPath = GetLocalCopyPath(wname)
-
+    
     ' Choose the folder where iteration files will be written
     initialFolder = ThisWorkbook.Path
     iterationPath = choose_directory(initialFolder)

@@ -1,5 +1,5 @@
 Attribute VB_Name = "file_helper"
-Sub get_savename(ByRef savename As String, ByRef save_file As Boolean, Optional Unit_name As String)
+Sub get_savename(ByRef savename As String, ByRef save_file As Boolean, Optional unit_name As String)
     Dim directory_path As String
     Dim file_selected As Variant
     Dim overwrite_exiting_file As VbMsgBoxResult
@@ -53,10 +53,12 @@ Public Function GetLocalCopyPath(wname As String) As String
     On Error Resume Next
     Kill tempPath
     On Error GoTo 0
-
     ' Save a fresh local copy of the workbook being converted
     Workbooks(wname).SaveCopyAs tempPath
-    
+    ' Add a delay to make sure the file is created
+    Do While Dir(tempPath) = ""
+        DoEvents
+    Loop
     GetLocalCopyPath = tempPath
 End Function
 

@@ -1,0 +1,11 @@
+﻿Private Sub CommandButton1_Click()
+    ReadFilesv2 (2)
+End Sub
+
+Private Sub CommandButton2_Click()
+    ReadFilesv2 (12)
+End Sub
+
+Private Sub CommandButton3_Click()
+    CompareArray3
+End Sub

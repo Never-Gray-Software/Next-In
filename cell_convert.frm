@@ -21,7 +21,7 @@ Private Sub CancelButton1_Click()
     MsgBox "PHEW! That was a close one. Be careful and back-up your files"
 End Sub
 
-Private Sub ContinueButton1_Click()
+Private Sub ContinueButton_4_excel_conversion_Click()
     Call convert_in_excel
 End Sub
 
