@@ -45,104 +45,89 @@ Sub ReadFile(Optional unit_test As String)
     ipversion = is_version_ip()
     On Error GoTo ErrorProc
     Dim StartTime As Variant
-    Dim cell_value, read_date, read_time As Variant
-    Dim read_info As String
-    Dim FormIn, Output As Worksheet
-    Dim FormRange As Range
+    Dim cell_value As String
     Dim directory_path As String
+
     'Select Input file with selection screen
-    If unit_test = "" Then 'Call dialog box
+    If unit_test = "" Then
         directory_path = Extract_Directory_Path(last_read_file_path.Value2)
         Call choosefile(Infile, directory_path)
-        If Infile = "" Then                      'Quit if there is no input file.
+        If Infile = "" Then
             Call Speedon(False)
             Exit Sub
         End If
-    Else                                         ' unit test is being conducted so infile is equal to another string
+    Else
         Infile = unit_test
     End If
+
     Call Speedon(True)
     StartTime = Timer
-    cell_value = last_read_version.Value2 'Value of last read in
+
+    ' Read last file's version BEFORE switching
+    cell_value = CStr(last_read_version.Value2)
+
     WriteForm.Show vbModeless
     WriteForm.TextBox2.value = "Adjusting Version"
-    Call ip_switch(wname, ipversion, cell_value)
-    If Not ipversion Then
-        last_read_version.Value2 = "SI"
-    Else
+
+    ' Switch workbook to match the file we are about to read
+    Call ip_switch(wname, is_version_ip(), cell_value)
+
+    ' IMPORTANT:
+    ' Recompute ipversion AFTER switching
+    ipversion = is_version_ip()
+
+    ' Update metadata based on the actual final unit system
+    If ipversion Then
         last_read_version.Value2 = "IP"
+    Else
+        last_read_version.Value2 = "SI"
     End If
+
     last_read_date.Value2 = Date
     last_read_time.Value2 = Time
     last_read_file_path.Value2 = Infile
     last_read_file_name.Value2 = Dir(Infile)
     last_used_by.Value2 = Workbooks(wname).BuiltinDocumentProperties("Last Author")
+
     WriteForm.TextBox2.value = "Reading input into memory"
     WriteForm.Repaint
-    Call TextFileToArray(Infile)                 'Create an DataArray from the text file for faster processing
-    WriteForm.TextBox2.value = "Clearing Forms"
-    WriteForm.Repaint
+
+    Call TextFileToArray(Infile)
     Call ClearForms(wname)
-    WriteForm.TextBox2.value = "Writing Formulas" '2p3 Moved up so default files are overwritten
-    WriteForm.Repaint
     Call Formulas(wname)
-    WriteForm.TextBox2.value = "Reading Form 1"
-    WriteForm.Repaint
     Call ReadForm1v2
-    WriteForm.TextBox2.value = "Reading Form 2"
-    WriteForm.Repaint
     Call ReadForm2v2
-    WriteForm.TextBox2.value = "Reading Form 3"
-    WriteForm.Repaint
     Call ReadForm3v2
-    WriteForm.TextBox2.value = "Reading Form 4"
-    WriteForm.Repaint
     Call ReadForm4v2
     Call ReadForm5v2
-    WriteForm.TextBox2.value = "Reading Form 6"
-    WriteForm.Repaint
     Call ReadForm6v2
-    WriteForm.TextBox2.value = "Reading Form 7 A and B"
-    WriteForm.Repaint
     Call ReadForm7ABv2
-    WriteForm.TextBox2.value = "Reading Form 7 C and D"
-    WriteForm.Repaint
     Call ReadForm7Cv2
     Call ReadForm7Dv2
-    WriteForm.TextBox2.value = "Reading Form 8"
-    WriteForm.Repaint
     Call ReadForm8v3
-    WriteForm.TextBox2.value = "Reading Form 9"
-    WriteForm.Repaint
     Call ReadForm9v3
-    WriteForm.TextBox2.value = "Reading Form 10"
-    WriteForm.Repaint
     Call ReadForm10v2
-    WriteForm.TextBox2.value = "Reading Form 11"
-    WriteForm.Repaint
     Call ReadForm11v2
-    WriteForm.TextBox2.value = "Reading Form 12"
-    WriteForm.Repaint
     Call ReadForm12v2
-    WriteForm.TextBox2.value = "Reading Form 13"
-    WriteForm.Repaint
     Call ReadForm13v2
-    WriteForm.TextBox2.value = "Reading Form 14"
-    WriteForm.Repaint
     Call ReadForm14v2
-    WriteForm.TextBox2.value = "Restart File"
-    WriteForm.Repaint
     Call ReadInitializationFile
+
     WriteForm.Hide
     Debug.Print unit_test & " Time to read Input is: " & (Timer - StartTime)
     Call Speedon(False)
+
     If unit_test = "" Then MsgBox "Finished Reading in File"
     Exit Sub
+
 ErrorProc:
     MsgBox "Error in procedure Read : " & Err.Description
     Call Speedon(False)
     Err.Clear
 End Sub
+
+
+
 
 Public Sub choosefile(Infile, Optional directory_path As String)
     On Error GoTo ErrorProc

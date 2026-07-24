@@ -1,1 +1,3 @@
-﻿
+﻿Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call delete_temp_files(Me.Name)
+End Sub

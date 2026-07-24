@@ -26,136 +26,83 @@ ErrorProc:
     Err.Clear
 End Sub
 
-Public Sub Call_NextOut(workbook_name As String, savename As Variant, _
-    Optional next_in_path As String = "", Optional iteration_path As String = "", _
-    Optional ses_version As String = "SI", Optional file_type As String = "next_in")
+Public Sub Call_NextOut( _
+    workbook_name As String, _
+    savename As Variant, _
+    Optional next_in_path As String = "", _
+    Optional iteration_path As String = "", _
+    Optional ses_version As String = "SI", _
+    Optional file_type As String = "next_in", _
+    Optional unit_test_in_progress As Boolean = False, _
+    Optional wait_for_finish As Boolean = False)
 
     On Error GoTo ErrorProc
 
     ' Status message
-    If Len(iteration_path) = 0 Then
+    If iteration_path = "" Then
         WriteForm.TextBox2.value = "Attempting to run Next-Out, then SES"
     Else
         WriteForm.TextBox2.value = "Writing Iterations with Next-Out"
     End If
     WriteForm.Repaint
 
-    ' Convert NextOut_Exe (Range ? String)
+    ' Convert Range to string safely
     Dim nextout_path As String
     nextout_path = CStr(NextOut_Exe.Value2)
 
     If Dir(nextout_path) = "" Then
-        MsgBox "Next Out executable not found at: " & nextout_path
+        MsgBox "Next-Out executable not found at: " & nextout_path
         Exit Sub
     End If
 
+    ' Build settings dictionary
     Dim settings_dict As Object
-    Dim shell_command As String
-    Dim argument As String
-
     Set settings_dict = CreateObject("Scripting.Dictionary")
 
-    ' --- BASIC SETTINGS ---
     settings_dict("output_conversion") = output_conversion_string
     settings_dict("file_type") = file_type
     settings_dict("output") = Get_Output_Setting(workbook_name)
-
-    ' SES_Exe (Range ? String)
     settings_dict("path_exe") = Settings_File_Path(CStr(SES_Exe.Value2))
-
-    ' ses_output_str MUST be a list
-    If Len(CStr(savename)) = 0 Then
-        settings_dict("ses_output_str") = Array("")
-    Else
-        settings_dict("ses_output_str") = Array(Settings_File_Path(CStr(savename)))
-    End If
-
+    settings_dict("ses_output_str") = Array(Settings_File_Path(CStr(savename)))
     settings_dict("simtime") = -1
-
-    ' Visio template (Range ? String)
     settings_dict("visio_template") = Settings_File_Path(CStr(Visio_File.Value2))
-
-    ' --- ITERATION PATH LOGIC (CRITICAL FIX) ---
-    Dim iter_path As String
-    iter_path = CStr(iteration_path)
-
-    If Len(iter_path) = 0 Then
-        ' Normal mode ? Python expects empty string
-        settings_dict("iteration_path") = ""
-    Else
-        ' Iteration mode ? real folder path
-        settings_dict("iteration_path") = Settings_File_Path(iter_path)
-    End If
-
-    ' --- SES VERSION ---
+    settings_dict("iteration_path") = Settings_File_Path(CStr(iteration_path))
     settings_dict("ses_version") = ses_version
-
-    ' --- NEXT-IN PATH ---
     settings_dict("next_in_path") = Settings_File_Path(CStr(next_in_path))
+    ' settings_dict("segments_2_lookup") = CStr(summary_numbers.Value2)
 
-    ' --- SUMMARY NUMBERS (only if Summary is selected) ---
-    If UBound(Filter(settings_dict("output"), "Summary")) >= 0 Then
-        Dim seg As String
-        seg = CStr(summary_numbers.Value2)
-    
-        If Len(seg) = 0 Then
-            settings_dict("segments_2_lookup") = Array()
-        ElseIf InStr(seg, ",") > 0 Then
-            settings_dict("segments_2_lookup") = Split(seg, ",")
-        Else
-            settings_dict("segments_2_lookup") = Array(seg)
-        End If
-        
-        ' Fire segment option
-        Dim ws As Worksheet
-        Set ws = Workbooks(workbook_name).Worksheets("Control")
-    
-        If ws.Shapes("NO_Fire_Segment").ControlFormat.value = xlOn Then
-            settings_dict("lookup_fire_data") = True   ' FIXED KEY NAME
-        End If
-        
-    End If
-
-    ' --- SERIALIZE PYTHON DICT ---
-    Dim settings_literal As String
-    settings_literal = PyDict(settings_dict)
-    
-    ' Escape internal quotes for Windows Shell
-    settings_literal = Replace(settings_literal, """", """""")
-    
-    argument = " --settings """ & settings_literal & """"
+    ' Serialize dictionary
+    Dim argument As String
+    argument = " --settings """ & PyDict(settings_dict) & """"
 
     Debug.Print "FINAL PYTHON DICT:"
     Debug.Print argument
 
-    ' --- BUILD COMMAND ---
+    ' Build shell command
+    Dim shell_command As String
     shell_command = """" & nextout_path & """" & argument
     Debug.Print shell_command
 
-    ' --- RUN NEXT-OUT, Wait Until Finished, Check File is written out ---
+    ' ? KEY CHANGE:
+    ' If convert_in_excel() calls this with wait_for_finish:=True,
+    ' we run synchronously. Otherwise, asynchronous.
+    If wait_for_finish Then
+        Dim sh As Object
+        Set sh = CreateObject("WScript.Shell")
+        sh.Run shell_command, 0, True   ' WAIT for Next-Out to finish
+    Else
+        Shell shell_command, vbNormalNoFocus   ' asynchronous
+    End If
+
     WriteForm.TextBox2.value = "Running SES and Next-Out"
     WriteForm.Repaint
-    Dim sh As Object, procID As Long
-    Set sh = CreateObject("WScript.Shell")
-    
-    procID = sh.Run(shell_command, 1, True)  ' Wait until Python finishes
-    
-    If procID <> 0 Then
-        WriteForm.TextBox2.value = "Next-Out failed"
-        WriteForm.Repaint
-    
-        MsgBox "Next-Out failed with exit code: " & procID & vbCrLf & _
-               "Check the Python log or console output.", _
-               vbCritical, "Next-Out Error"
-    
-        Exit Sub
-    End If
     Exit Sub
 
 ErrorProc:
     MsgBox "Error in procedure Call_NextOut: " & Err.Description
     Err.Clear
 End Sub
+
 
 Function Get_Output_Setting(workbook_name As String) As Variant
     On Error GoTo ErrorProc
@@ -172,11 +119,11 @@ Function Get_Output_Setting(workbook_name As String) As Variant
     If ws.Shapes("NO_Route_Data").ControlFormat.value = xlOn Then
         output_options.Add "Route"
     End If
-    If ws.Shapes("NO_H5_File").ControlFormat.value = xlOn Then
-        output_options.Add "H5_file"
-    End If
     If ws.Shapes("NO_Summary").ControlFormat.value = xlOn Then
         output_options.Add "Summary"
+        output_options.Add "H5_file" 'H5 option needed for summary files
+    ElseIf ws.Shapes("NO_H5_File").ControlFormat.value = xlOn Then
+        output_options.Add "H5_file"
     End If
     If ws.Shapes("NO_Visio").ControlFormat.value = xlOn Then
         output_options.Add "Visio"

@@ -4,6 +4,7 @@ Option Explicit
 Public Sub Next_out_conversion(wname As String, Optional unit_name As String)
     Dim ses_version As String
     Dim next_in_path As String
+    Dim unit_test_in_progress As Boolean
     If Len(unit_name) = 0 Then unit_name = ""
     ' Determine conversion direction
     If input_conversion.Value2 = 2 And si_ip_option.Value2 = 1 Then
@@ -21,7 +22,10 @@ Public Sub Next_out_conversion(wname As String, Optional unit_name As String)
         Dim save_file As Boolean
         get_savename savename, save_file
         If Not save_file Then Exit Sub
-    Else: savename = unit_name
+        unit_test_in_progress = False
+    Else:
+        savename = unit_name
+        unit_test_in_progress = True
     End If
     ' Create guaranteed local copy
     next_in_path = GetLocalCopyPath(wname)
@@ -32,7 +36,8 @@ Public Sub Next_out_conversion(wname As String, Optional unit_name As String)
         savename:=savename, _
         next_in_path:=next_in_path, _
         ses_version:=ses_version, _
-        file_type:="next_in"
+        file_type:="next_in", _
+        unit_test_in_progress:=unit_test_in_progress
 
     ' Handle SES or Next-Out+SES options
     If Write_Option = 2 Then
@@ -70,8 +75,13 @@ Public Sub convert_in_excel()
     Dim next_in_path As String
     Dim temp_input_2_read_in As String
     Dim temp_folder As String
+    Dim before_conversion_read_file_name As String
+    Dim before_conversion_read_file_path As String
 
     wname = ActiveWorkbook.Name
+
+    ' Refresh global ranges FIRST
+    Get_Control_Values wname
 
     ' Current units of workbook
     from_units = si_ip_option.Value2
@@ -79,18 +89,10 @@ Public Sub convert_in_excel()
     ' Decide conversion direction
     Select Case input_conversion.Value2
         Case 2      ' SI ? IP
-            If from_units <> 1 Then
-                MsgBox "Error! Input Conversion must be 'IP to SI' for Read in Units of 'IP'.", vbCritical
-                Exit Sub
-            End If
             ses_version = "SI_TO_IP"
             to_units = 2
 
         Case 3      ' IP ? SI
-            If from_units <> 2 Then
-                MsgBox "Error! Input Conversion must be 'SI to IP' for Read In Units 'SI'.", vbCritical
-                Exit Sub
-            End If
             ses_version = "IP_TO_SI"
             to_units = 1
 
@@ -101,14 +103,10 @@ Public Sub convert_in_excel()
 
     ' Create guaranteed local copy
     next_in_path = GetLocalCopyPath(wname)
-    If Dir(next_in_path) = "" Then
-        MsgBox "Local Next-In file not found: " & next_in_path, vbCritical
-        Exit Sub
-    End If
 
     ' Build temporary file path
     temp_folder = Extract_Directory_Path(next_in_path)
-    temp_input_2_read_in = temp_folder & "\temporary_input_file_for_convert_in_excel.inp"
+    temp_input_2_read_in = temp_folder & "temporary_input_file_for_convert_in_excel.inp"
 
     ' Run Next-Out conversion
     Call_NextOut _
@@ -116,34 +114,36 @@ Public Sub convert_in_excel()
         savename:=temp_input_2_read_in, _
         next_in_path:=next_in_path, _
         ses_version:=ses_version, _
-        file_type:="next_in"
-
-    If Dir(temp_input_2_read_in) = "" Then
-        MsgBox "Next-Out did not produce a converted file.", vbCritical
-        Exit Sub
-    End If
+        file_type:="next_in", _
+        wait_for_finish:=True
 
     cell_convert.Hide
-
-    ' Update units BEFORE reading converted file
-    si_ip_option.Value2 = to_units
-
-    ' Copy previous read file name and path
-    Dim before_conversion_read_file_name As String
-    Dim before_conversion_read_file_path As String
+    
+    
+    ' Save old read-file info
     before_conversion_read_file_name = CStr(last_read_file_name.Value2)
     before_conversion_read_file_path = CStr(last_read_file_path.Value2)
-    ' Read converted file
-    Call ReadFile(temp_input_2_read_in)
     
-    ' Update the name of read file and path because it was changed by ReadFile
+    ' IMPORTANT:
+    ' Read the converted file after changing unit system
+    si_ip_option.Value2 = to_units
+    Call ReadFile(temp_input_2_read_in)
+
+    ' Reset conversion dropdown
+    input_conversion.Value2 = 1
+
+    ' Update read-file metadata
     last_read_file_name.Value2 = before_conversion_read_file_name & " " & ses_version
     last_read_file_path.Value2 = before_conversion_read_file_path
+
     Exit Sub
 
 ConvertError:
     MsgBox "Error converting values in Excel: " & Err.Description, vbCritical
     cell_convert.Hide
 End Sub
+
+
+
 
 
