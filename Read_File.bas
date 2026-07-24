@@ -42,8 +42,9 @@ Dim last_line_with_data As String
 Sub ReadFile(Optional unit_test As String)
     wname = ActiveWorkbook.Name
     Call Get_Control_Values(wname)
-    ipversion = is_version_ip()
+
     On Error GoTo ErrorProc
+
     Dim StartTime As Variant
     Dim cell_value As String
     Dim directory_path As String
